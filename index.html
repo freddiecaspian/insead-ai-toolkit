@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSEAD AI Toolkit</title>
+<style>
+  /* ========== RESET & BASE ========== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f1419;
+    --ink-light: #536471;
+    --ink-faint: #8899a6;
+    --surface: #ffffff;
+    --surface-hover: #f7f9fa;
+    --surface-active: #eff3f4;
+    --border: #e1e8ed;
+    --border-light: #eef0f2;
+    --accent: #1d9bf0;
+    --accent-hover: #1a8cd8;
+    --accent-bg: #e8f5fd;
+    --upvote: #ff6b35;
+    --upvote-bg: #fff4ef;
+    --gold: #f7b731;
+    --gold-bg: #fef9ec;
+    --silver: #a5b1c2;
+    --bronze: #cd7f32;
+    --green: #00ba7c;
+    --green-bg: #e8faf3;
+    --purple: #7856ff;
+    --purple-bg: #f3efff;
+    --red: #f4212e;
+    --gradient-start: #667eea;
+    --gradient-end: #764ba2;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #f5f6f8;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ========== TOPBAR ========== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+  .logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .logo-text span {
+    color: var(--ink-light);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-link {
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .nav-link:hover { background: var(--surface-active); color: var(--ink); }
+  .nav-link.active { color: var(--ink); background: var(--surface-active); }
+  .nav-submit {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+  .nav-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+  /* ========== HERO ========== */
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 72px 24px 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(102, 126, 234, 0.15), transparent 50%),
+                radial-gradient(ellipse at 70% 50%, rgba(118, 75, 162, 0.12), transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+  }
+  @keyframes heroGlow {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-2%, 1%) scale(1.05); }
+  }
+  .hero-content {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+    max-width: 540px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 40px;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+  }
+  .hero-stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* ========== MAIN LAYOUT ========== */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ========== FILTER BAR ========== */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+  .filter-tab {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .filter-tab:hover { color: var(--ink); }
+  .filter-tab.active {
+    background: var(--ink);
+    color: white;
+  }
+  .filter-categories {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .cat-pill {
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .cat-pill:hover { border-color: var(--ink-light); color: var(--ink); }
+  .cat-pill.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  /* ========== TOOL CARDS ========== */
+  .tool-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 16px;
+    align-items: start;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .tool-card:hover {
+    border-color: #ccd6dd;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  .tool-card.featured {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #fffdf5 0%, var(--surface) 100%);
+  }
+  .tool-card.featured::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), #f0c040);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* Vote column */
+  .vote-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 2px;
+  }
+  .vote-btn {
+    width: 36px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 14px;
+    color: var(--ink-light);
+  }
+  .vote-btn:hover { border-color: var(--upvote); color: var(--upvote); background: var(--upvote-bg); }
+  .vote-btn.voted { border-color: var(--upvote); color: var(--upvote); background: var(--upvote-bg); }
+  .vote-count {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Tool content */
+  .tool-content { min-width: 0; }
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .tool-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-faint);
+    min-width: 20px;
+  }
+  .tool-rank.gold { color: var(--gold); }
+  .tool-rank.silver { color: var(--silver); }
+  .tool-rank.bronze { color: var(--bronze); }
+  .tool-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  .tool-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .tool-badge.new { background: var(--green-bg); color: var(--green); }
+  .tool-badge.hot { background: #fff0f0; color: var(--red); }
+  .tool-badge.rising { background: var(--purple-bg); color: var(--purple); }
+  .tool-badge.staff-pick { background: var(--gold-bg); color: #b8860b; }
+  .tool-desc {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .tool-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    flex-wrap: wrap;
+  }
+  .tool-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tool-author {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: var(--ink-light);
+  }
+  .avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .tool-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .tool-tag {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--surface-active);
+    color: var(--ink-light);
+  }
+  .tool-tag.type-agent { background: var(--purple-bg); color: var(--purple); }
+  .tool-tag.type-prompt { background: var(--accent-bg); color: var(--accent); }
+  .tool-tag.type-workflow { background: var(--green-bg); color: var(--green); }
+  .tool-tag.type-automation { background: var(--upvote-bg); color: var(--upvote); }
+  .tool-tag.type-template { background: var(--gold-bg); color: #b8860b; }
+
+  /* Right meta col */
+  .tool-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 100px;
+  }
+  .tool-comments {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .tool-comments:hover { background: var(--surface-active); color: var(--ink-light); }
+  .tool-fork {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .tool-fork:hover { background: var(--surface-active); color: var(--ink-light); }
+
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 84px;
+  }
+  .sidebar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .sidebar-card-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-card-body {
+    padding: 14px 18px;
+  }
+
+  /* About card */
+  .about-text {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .about-stat {
+    padding: 10px;
+    background: var(--surface-hover);
+    border-radius: var(--radius-sm);
+    text-align: center;
+  }
+  .about-stat-num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+  .about-stat-label {
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  /* Leaderboard card */
+  .leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .leaderboard-item:last-child { border: none; }
+  .leaderboard-rank {
+    font-size: 13px;
+    font-weight: 800;
+    min-width: 20px;
+    text-align: center;
+  }
+  .leaderboard-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .leaderboard-info { flex: 1; min-width: 0; }
+  .leaderboard-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .leaderboard-detail {
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .leaderboard-score {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--upvote);
+  }
+
+  /* Trending tags */
+  .trending-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .trending-tag {
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--surface-hover);
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+  }
+  .trending-tag:hover { border-color: var(--border); color: var(--ink); }
+
+  /* Activity feed */
+  .activity-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.4;
+  }
+  .activity-item:last-child { border: none; }
+  .activity-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .activity-name { font-weight: 600; color: var(--ink); }
+  .activity-time { font-size: 11px; color: var(--ink-faint); display: block; margin-top: 2px; }
+
+  /* Maturity card */
+  .maturity-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .maturity-level {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-hover);
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  .maturity-level:hover { background: var(--surface-active); }
+  .maturity-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .maturity-num.l1 { background: #94a3b8; }
+  .maturity-num.l2 { background: var(--accent); }
+  .maturity-num.l3 { background: var(--purple); }
+  .maturity-num.l4 { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); }
+  .maturity-text { flex: 1; }
+  .maturity-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .maturity-sub {
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .maturity-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    padding: 2px 8px;
+    background: var(--surface);
+    border-radius: 100px;
+  }
+
+  /* ========== EXPANDED DETAIL MODAL ========== */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    max-width: 680px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+    transform: translateY(20px) scale(0.97);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .modal-overlay.active .modal {
+    transform: translateY(0) scale(1);
+  }
+  .modal-header {
+    padding: 28px 32px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-active);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--ink-light);
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--border); }
+  .modal-body { padding: 20px 32px 32px; }
+  .modal-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .modal-author-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+  }
+  .modal-desc {
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .modal-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .modal-code {
+    background: #1a1a2e;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .modal-code .comment { color: #64748b; }
+  .modal-code .keyword { color: #a78bfa; }
+  .modal-code .string { color: #34d399; }
+  .modal-code .function { color: #60a5fa; }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+  }
+  .modal-btn {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .modal-btn:hover { background: var(--surface-active); }
+  .modal-btn.primary {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .modal-btn.primary:hover { opacity: 0.9; }
+
+  /* ========== SUBMIT FORM ========== */
+  .submit-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+  .submit-card {
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    text-align: center;
+    transition: var(--transition);
+  }
+  .submit-card:hover { border-color: var(--ink-light); }
+  .submit-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .submit-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .submit-desc {
+    font-size: 15px;
+    color: var(--ink-light);
+    max-width: 480px;
+    margin: 0 auto 24px;
+  }
+  .submit-types {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .submit-type {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .submit-type:hover { border-color: var(--ink-light); color: var(--ink); background: var(--surface-hover); }
+
+  /* ========== FOOTER ========== */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  .footer strong { color: var(--ink-light); }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .hero h1 { font-size: 36px; }
+    .hero-stats { gap: 28px; }
+    .hero-stat-number { font-size: 24px; }
+    .tool-card { grid-template-columns: 48px 1fr; }
+    .tool-right { display: none; }
+  }
+  @media (max-width: 600px) {
+    .topbar-nav .nav-link:not(.active) { display: none; }
+    .hero { padding: 48px 20px 40px; }
+    .hero h1 { font-size: 28px; }
+    .tool-card { padding: 16px; gap: 12px; }
+    .submit-card { padding: 32px 20px; }
+    .modal-header, .modal-body { padding-left: 20px; padding-right: 20px; }
+  }
+
+  /* ========== ANIMATIONS ========== */
+  .tool-card { animation: fadeInUp 0.4s ease both; }
+  .tool-card:nth-child(1) { animation-delay: 0s; }
+  .tool-card:nth-child(2) { animation-delay: 0.05s; }
+  .tool-card:nth-child(3) { animation-delay: 0.1s; }
+  .tool-card:nth-child(4) { animation-delay: 0.15s; }
+  .tool-card:nth-child(5) { animation-delay: 0.2s; }
+  .tool-card:nth-child(6) { animation-delay: 0.25s; }
+  .tool-card:nth-child(7) { animation-delay: 0.3s; }
+  .tool-card:nth-child(8) { animation-delay: 0.35s; }
+  .tool-card:nth-child(9) { animation-delay: 0.4s; }
+  .tool-card:nth-child(10) { animation-delay: 0.45s; }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== TOP BAR ========== -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">AI</div>
+      <div class="logo-text">INSEAD Toolkit<span>26D</span></div>
+    </a>
+    <div class="topbar-nav">
+      <a class="nav-link active" onclick="showSection('trending')">Trending</a>
+      <a class="nav-link" onclick="showSection('newest')">New</a>
+      <a class="nav-link" onclick="showSection('categories')">Collections</a>
+      <a class="nav-link" onclick="showSection('people')">People</a>
+      <a class="nav-submit" onclick="scrollToSubmit()">+ Share a Tool</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Open to all INSEAD students
+    </div>
+    <h1>The workflows your<br>classmates <span class="gradient-text">actually use</span></h1>
+    <p>Community-curated AI tools, prompts, agents, and automations. Built by INSEAD students, voted on by the cohort. The best stuff rises to the top.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-number">47</div>
+        <div class="hero-stat-label">Tools shared</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">312</div>
+        <div class="hero-stat-label">Upvotes cast</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">23</div>
+        <div class="hero-stat-label">Contributors</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">89</div>
+        <div class="hero-stat-label">Forks made</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MAIN ========== -->
+<div class="main">
+  <div class="feed">
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter(this)">&#9650; Top</button>
+        <button class="filter-tab" onclick="setFilter(this)">&#x1F525; Hot</button>
+        <button class="filter-tab" onclick="setFilter(this)">&#10024; New</button>
+        <button class="filter-tab" onclick="setFilter(this)">&#x1F4C8; Rising</button>
+      </div>
+      <div class="filter-categories">
+        <span class="cat-pill active" onclick="setCat(this)">All</span>
+        <span class="cat-pill" onclick="setCat(this)">Productivity</span>
+        <span class="cat-pill" onclick="setCat(this)">Learning</span>
+        <span class="cat-pill" onclick="setCat(this)">Career</span>
+        <span class="cat-pill" onclick="setCat(this)">Agents</span>
+        <span class="cat-pill" onclick="setCat(this)">Content</span>
+      </div>
+    </div>
+
+    <!-- Tool cards -->
+    <div class="tool-list">
+
+      <!-- #1 Morning Briefing -->
+      <div class="tool-card featured" onclick="openModal('morning-briefing')">
+        <div class="vote-col">
+          <button class="vote-btn voted" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">127</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank gold">#1</span>
+            <span class="tool-title">Morning Briefing Podcast</span>
+            <span class="tool-badge staff-pick">Staff Pick</span>
+            <span class="tool-badge hot">Hot</span>
+          </div>
+          <div class="tool-desc">Fully automated daily podcast that reads your tasks, calendar, and notes - then generates a personalised audio briefing with AI voice. Wakes you up with what matters. Runs five research agents in parallel before a composer writes the script.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+              Freddie Chambers
+            </span>
+            <span class="tool-meta-item">3 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-automation">Automation</span>
+              <span class="tool-tag type-agent">Multi-Agent</span>
+              <span class="tool-tag">Productivity</span>
+              <span class="tool-tag">ElevenLabs</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 34</span>
+          <span class="tool-fork">&#x1F500; 19 forks</span>
+        </div>
+      </div>
+
+      <!-- #2 Assignment Prep -->
+      <div class="tool-card" onclick="openModal('assignment-prep')">
+        <div class="vote-col">
+          <button class="vote-btn voted" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">98</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank silver">#2</span>
+            <span class="tool-title">INSEAD Assignment Prep Agent</span>
+            <span class="tool-badge hot">Hot</span>
+          </div>
+          <div class="tool-desc">Paste your assignment brief and it loads every lecture note, reading, and framework from that course. Maps the question to relevant models, surfaces cross-course connections, identifies common pitfalls, and drafts an approach - all before you write a word.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+              Freddie Chambers
+            </span>
+            <span class="tool-meta-item">5 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-agent">Agent</span>
+              <span class="tool-tag">Learning</span>
+              <span class="tool-tag">INSEAD</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 28</span>
+          <span class="tool-fork">&#x1F500; 41 forks</span>
+        </div>
+      </div>
+
+      <!-- #3 Financial Modelling -->
+      <div class="tool-card" onclick="openModal('fin-model')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">84</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank bronze">#3</span>
+            <span class="tool-title">Financial Modelling Copilot</span>
+            <span class="tool-badge rising">Rising</span>
+          </div>
+          <div class="tool-desc">Conversational agent that walks you through building DCF, LBO, and comparable company models step by step. Explains the "why" behind each assumption. Trained on Damodaran's frameworks plus INSEAD FMV course materials.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">JD</span>
+              Joshua Dawe
+            </span>
+            <span class="tool-meta-item">1 week ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-agent">Agent</span>
+              <span class="tool-tag">Finance</span>
+              <span class="tool-tag">Learning</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 22</span>
+          <span class="tool-fork">&#x1F500; 31 forks</span>
+        </div>
+      </div>
+
+      <!-- #4 CV Workshop -->
+      <div class="tool-card" onclick="openModal('cv-workshop')">
+        <div class="vote-col">
+          <button class="vote-btn voted" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">76</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#4</span>
+            <span class="tool-title">CV Workshop Agent</span>
+          </div>
+          <div class="tool-desc">Paste a job description and your CV. It maps role requirements, finds unexpected connections in your background you'd never think of, then workshops bullet-by-bullet with strategic reasoning for each edit. Shows its thinking so you learn the craft, not just get output.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+              Freddie Chambers
+            </span>
+            <span class="tool-meta-item">1 week ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-agent">Agent</span>
+              <span class="tool-tag">Career</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 19</span>
+          <span class="tool-fork">&#x1F500; 27 forks</span>
+        </div>
+      </div>
+
+      <!-- #5 Lecture PDF Pipeline -->
+      <div class="tool-card" onclick="openModal('lecture-pipeline')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">71</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#5</span>
+            <span class="tool-title">Lecture Notes from PDF</span>
+            <span class="tool-badge new">New</span>
+          </div>
+          <div class="tool-desc">Drop a lecture handout PDF and get comprehensive study notes in seconds. Renders every slide as an image, batches them across parallel agents, reproduces tables and diagrams as text, and stitches it all into a single structured document.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+              Freddie Chambers
+            </span>
+            <span class="tool-meta-item">2 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-automation">Automation</span>
+              <span class="tool-tag type-agent">Multi-Agent</span>
+              <span class="tool-tag">Learning</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 15</span>
+          <span class="tool-fork">&#x1F500; 12 forks</span>
+        </div>
+      </div>
+
+      <!-- #6 Public Sector AI Framework -->
+      <div class="tool-card" onclick="openModal('public-sector')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">63</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#6</span>
+            <span class="tool-title">Policy Brief Generator</span>
+          </div>
+          <div class="tool-desc">Takes a policy topic and generates a structured brief: stakeholder map, evidence synthesis from academic sources, three scenario outcomes, and implementation risks. Built from 6 years of Singapore government AI deployment experience.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">JF</span>
+              Justin Foo
+            </span>
+            <span class="tool-meta-item">4 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-prompt">Prompt</span>
+              <span class="tool-tag">Strategy</span>
+              <span class="tool-tag">Policy</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 11</span>
+          <span class="tool-fork">&#x1F500; 8 forks</span>
+        </div>
+      </div>
+
+      <!-- #7 Product Launch Toolkit -->
+      <div class="tool-card" onclick="openModal('product-launch')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">58</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#7</span>
+            <span class="tool-title">Product Launch Brief Builder</span>
+            <span class="tool-badge rising">Rising</span>
+          </div>
+          <div class="tool-desc">Structured prompt chain that builds a go-to-market brief from scratch. Generates positioning, competitive landscape, channel strategy, and launch timeline. Pressure-tested on Gemini's actual launch playbook structure.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">SP</span>
+              Sachin Pillay
+            </span>
+            <span class="tool-meta-item">6 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-workflow">Workflow</span>
+              <span class="tool-tag">Marketing</span>
+              <span class="tool-tag">Strategy</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 9</span>
+          <span class="tool-fork">&#x1F500; 14 forks</span>
+        </div>
+      </div>
+
+      <!-- #8 Case Cracker -->
+      <div class="tool-card" onclick="openModal('case-cracker')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">52</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#8</span>
+            <span class="tool-title">Case Interview Sparring Partner</span>
+          </div>
+          <div class="tool-desc">Simulates a full case interview with realistic interviewer behaviour. Pushes back on weak logic, asks follow-ups, and scores your structure, creativity, and quantitative reasoning. Adjusts difficulty based on target firm (MBB vs boutique).</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">LG</span>
+              Liyang Guo
+            </span>
+            <span class="tool-meta-item">1 week ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-agent">Agent</span>
+              <span class="tool-tag">Career</span>
+              <span class="tool-tag">Consulting</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 16</span>
+          <span class="tool-fork">&#x1F500; 22 forks</span>
+        </div>
+      </div>
+
+      <!-- #9 Vibe Coder -->
+      <div class="tool-card" onclick="openModal('vibe-coder')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">45</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#9</span>
+            <span class="tool-title">MVP Builder Prompt Chain</span>
+            <span class="tool-badge new">New</span>
+          </div>
+          <div class="tool-desc">Go from "I have an idea" to a deployed prototype in one session. Structured chain: validate concept, design data model, scaffold full-stack app, deploy to Vercel. Non-technical founders have shipped real MVPs with this in under 3 hours.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">BV</span>
+              Bhaskar Venkatraman
+            </span>
+            <span class="tool-meta-item">1 day ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-workflow">Workflow</span>
+              <span class="tool-tag">Vibe Coding</span>
+              <span class="tool-tag">IVC</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 7</span>
+          <span class="tool-fork">&#x1F500; 6 forks</span>
+        </div>
+      </div>
+
+      <!-- #10 Ops Dashboard -->
+      <div class="tool-card" onclick="openModal('ops-agent')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">41</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#10</span>
+            <span class="tool-title">Operations Bottleneck Finder</span>
+          </div>
+          <div class="tool-desc">Upload a process description or ops data and it maps the workflow, identifies bottlenecks using Theory of Constraints, and recommends where AI automation would have the highest ROI. Built for P3 Process &amp; Operations course assignments.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #fa709a, #fee140);">SB</span>
+              Sienna Belda
+            </span>
+            <span class="tool-meta-item">5 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-prompt">Prompt</span>
+              <span class="tool-tag">Operations</span>
+              <span class="tool-tag">Learning</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 8</span>
+          <span class="tool-fork">&#x1F500; 5 forks</span>
+        </div>
+      </div>
+
+      <!-- #11 Daily Triage -->
+      <div class="tool-card" onclick="openModal('daily-triage')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">38</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#11</span>
+            <span class="tool-title">Daily Task Triage System</span>
+          </div>
+          <div class="tool-desc">Every morning: pulls your tasks, carries forward unfinished items, flags what's been sitting too long, and generates a clean Do/Keen/Park/Kill decision board. Pairs with the Morning Briefing for a full "AI chief of staff" workflow.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+              Freddie Chambers
+            </span>
+            <span class="tool-meta-item">1 week ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-automation">Automation</span>
+              <span class="tool-tag">Productivity</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 12</span>
+          <span class="tool-fork">&#x1F500; 9 forks</span>
+        </div>
+      </div>
+
+      <!-- #12 Voice Bot Builder -->
+      <div class="tool-card" onclick="openModal('voice-bot')">
+        <div class="vote-col">
+          <button class="vote-btn" onclick="event.stopPropagation(); vote(this)">&#9650;</button>
+          <span class="vote-count">33</span>
+        </div>
+        <div class="tool-content">
+          <div class="tool-header">
+            <span class="tool-rank">#12</span>
+            <span class="tool-title">AI Voice Agent Template</span>
+            <span class="tool-badge new">New</span>
+          </div>
+          <div class="tool-desc">Starter kit for building conversational voice agents. Covers personality design, speech-to-text pipeline, response generation, and text-to-speech output. Includes a working example that answers questions about your course schedule.</div>
+          <div class="tool-meta">
+            <span class="tool-author">
+              <span class="avatar" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4);">SB</span>
+              Saurabh Bhatia
+            </span>
+            <span class="tool-meta-item">2 days ago</span>
+            <div class="tool-tags">
+              <span class="tool-tag type-template">Template</span>
+              <span class="tool-tag type-agent">Agent</span>
+              <span class="tool-tag">Voice AI</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-right">
+          <span class="tool-comments">&#x1F4AC; 6</span>
+          <span class="tool-fork">&#x1F500; 3 forks</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+
+    <!-- About -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">&#x1F4E1; About this Toolkit</div>
+      <div class="sidebar-card-body">
+        <div class="about-text">
+          Community-curated AI workflows from the INSEAD 26D cohort. Share what you've built. Upvote what works. The best tools rise to the top so the next person who needs them finds them first.
+        </div>
+        <div class="about-stats">
+          <div class="about-stat">
+            <div class="about-stat-num">47</div>
+            <div class="about-stat-label">Tools</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">23</div>
+            <div class="about-stat-label">Contributors</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">312</div>
+            <div class="about-stat-label">Upvotes</div>
+          </div>
+          <div class="about-stat">
+            <div class="about-stat-num">89</div>
+            <div class="about-stat-label">Forks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Maturity -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">&#x1F4CA; Browse by AI Maturity Level</div>
+      <div class="sidebar-card-body">
+        <div class="maturity-levels">
+          <div class="maturity-level">
+            <span class="maturity-num l1">1</span>
+            <div class="maturity-text">
+              <div class="maturity-title">Literate</div>
+              <div class="maturity-sub">Understand what AI can do</div>
+            </div>
+            <span class="maturity-count">8</span>
+          </div>
+          <div class="maturity-level">
+            <span class="maturity-num l2">2</span>
+            <div class="maturity-text">
+              <div class="maturity-title">Productive</div>
+              <div class="maturity-sub">Use AI to do things faster</div>
+            </div>
+            <span class="maturity-count">21</span>
+          </div>
+          <div class="maturity-level">
+            <span class="maturity-num l3">3</span>
+            <div class="maturity-text">
+              <div class="maturity-title">Automation</div>
+              <div class="maturity-sub">Delegate entire workflows to AI</div>
+            </div>
+            <span class="maturity-count">14</span>
+          </div>
+          <div class="maturity-level">
+            <span class="maturity-num l4">4</span>
+            <div class="maturity-text">
+              <div class="maturity-title">AI Native</div>
+              <div class="maturity-sub">Built with AI as infrastructure</div>
+            </div>
+            <span class="maturity-count">4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Contributors -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">&#x1F3C6; Top Contributors</div>
+      <div class="sidebar-card-body">
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank" style="color: var(--gold);">1</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Freddie Chambers</div>
+            <div class="leaderboard-detail">12 tools &middot; 4 agents</div>
+          </div>
+          <span class="leaderboard-score">+431</span>
+        </div>
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank" style="color: var(--silver);">2</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">JD</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Joshua Dawe</div>
+            <div class="leaderboard-detail">7 tools &middot; 2 agents</div>
+          </div>
+          <span class="leaderboard-score">+218</span>
+        </div>
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank" style="color: var(--bronze);">3</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">JF</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Justin Foo</div>
+            <div class="leaderboard-detail">5 tools &middot; 1 agent</div>
+          </div>
+          <span class="leaderboard-score">+156</span>
+        </div>
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank">4</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">SP</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Sachin Pillay</div>
+            <div class="leaderboard-detail">4 tools &middot; 1 agent</div>
+          </div>
+          <span class="leaderboard-score">+134</span>
+        </div>
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank">5</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #fa709a, #fee140);">SB</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Sienna Belda</div>
+            <div class="leaderboard-detail">4 tools</div>
+          </div>
+          <span class="leaderboard-score">+97</span>
+        </div>
+        <div class="leaderboard-item">
+          <span class="leaderboard-rank">6</span>
+          <span class="leaderboard-avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">LG</span>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">Liyang Guo</div>
+            <div class="leaderboard-detail">3 tools</div>
+          </div>
+          <span class="leaderboard-score">+89</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trending tags -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">&#x1F525; Trending Tags</div>
+      <div class="sidebar-card-body">
+        <div class="trending-tags">
+          <span class="trending-tag">#AssignmentPrep</span>
+          <span class="trending-tag">#ClaudeCode</span>
+          <span class="trending-tag">#VibeCoding</span>
+          <span class="trending-tag">#CVOptimisation</span>
+          <span class="trending-tag">#LectureNotes</span>
+          <span class="trending-tag">#MultiAgent</span>
+          <span class="trending-tag">#CaseInterview</span>
+          <span class="trending-tag">#ElevenLabs</span>
+          <span class="trending-tag">#Automation</span>
+          <span class="trending-tag">#IVC</span>
+          <span class="trending-tag">#Finance</span>
+          <span class="trending-tag">#Operations</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">&#x26A1; Recent Activity</div>
+      <div class="sidebar-card-body">
+        <div class="activity-item">
+          <span class="activity-avatar" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4);">SB</span>
+          <div>
+            <span class="activity-name">Saurabh</span> shared <strong>AI Voice Agent Template</strong>
+            <span class="activity-time">2 hours ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-avatar" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">BV</span>
+          <div>
+            <span class="activity-name">Bhaskar</span> shared <strong>MVP Builder Prompt Chain</strong>
+            <span class="activity-time">Yesterday</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-avatar" style="background: #94a3b8;">SN</span>
+          <div>
+            <span class="activity-name">Sanam</span> forked <strong>Assignment Prep Agent</strong>
+            <span class="activity-time">Yesterday</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">II</span>
+          <div>
+            <span class="activity-name">Isabella</span> upvoted 3 tools in <strong>Career</strong>
+            <span class="activity-time">2 days ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">FC</span>
+          <div>
+            <span class="activity-name">Freddie</span> shared <strong>Lecture Notes from PDF</strong>
+            <span class="activity-time">2 days ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- ========== SUBMIT SECTION ========== -->
+<section class="submit-section" id="submit">
+  <div class="submit-card">
+    <div class="submit-icon">&#x1F680;</div>
+    <div class="submit-title">Share something you've built</div>
+    <div class="submit-desc">Built a sick prompt? Automated a workflow? Trained an agent? Share it with the cohort. Every contribution helps someone else level up.</div>
+    <div class="submit-types">
+      <div class="submit-type">&#x1F4DD; Prompt</div>
+      <div class="submit-type">&#x1F504; Workflow</div>
+      <div class="submit-type">&#x1F916; Agent</div>
+      <div class="submit-type">&#x26A1; Automation</div>
+      <div class="submit-type">&#x1F4CB; Template</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MODAL ========== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Morning Briefing Podcast</div>
+        <div class="modal-author-line" id="modalAuthor">
+          <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2); width:24px; height:24px; font-size:11px;">FC</span>
+          Freddie Chambers &middot; 3 days ago &middot; 127 upvotes
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Dynamic content injected here -->
+    </div>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <strong>INSEAD AI Toolkit</strong> &middot; Built by the 26D AI Club &middot; Open to all INSEAD students<br>
+  <span style="opacity: 0.7; font-size: 12px; margin-top: 4px; display: inline-block;">"A fool with a tool is still a fool. The most expensive mistake isn't using the wrong model - it's outsourcing the thinking that makes you valuable."</span>
+</footer>
+
+<script>
+// ========== FILTER INTERACTIONS ==========
+function setFilter(el) {
+  el.parentElement.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setCat(el) {
+  el.parentElement.querySelectorAll('.cat-pill').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function showSection(s) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function scrollToSubmit() {
+  document.getElementById('submit').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== VOTING ==========
+function vote(btn) {
+  const countEl = btn.parentElement.querySelector('.vote-count');
+  let count = parseInt(countEl.textContent);
+  if (btn.classList.contains('voted')) {
+    btn.classList.remove('voted');
+    countEl.textContent = count - 1;
+  } else {
+    btn.classList.add('voted');
+    countEl.textContent = count + 1;
+  }
+}
+
+// ========== MODAL ==========
+const toolData = {
+  'morning-briefing': {
+    title: 'Morning Briefing Podcast',
+    author: 'Freddie Chambers',
+    avatar: 'FC',
+    color: 'linear-gradient(135deg, #667eea, #764ba2)',
+    time: '3 days ago',
+    votes: 127,
+    desc: `<p>A fully automated personal podcast that runs every morning before you wake up. It reads your task list, scans your calendar, researches every person and project you'll encounter that day, then generates a conversational audio briefing in a British female voice.</p>
+    <p>The magic is in the research layer - five specialist AI agents run in parallel:</p>
+    <ul style="margin:12px 0; padding-left:20px; color:var(--ink-light); line-height:1.8;">
+      <li><strong>People Agent</strong> - Searches your notes for everyone mentioned. Who are they? When did you last interact? Any open threads?</li>
+      <li><strong>Project Status Agent</strong> - Analyses your tasks for duplicates, quick wins, and things that have been sitting too long</li>
+      <li><strong>Project History Agent</strong> - Checks the last 14 days of triage for task persistence. Flags anything you keep pushing</li>
+      <li><strong>Project Context Agent</strong> - Finds related notes, deadlines, dependencies from your knowledge base</li>
+      <li><strong>Calendar Agent</strong> - Spots back-to-back conflicts, suspiciously empty blocks, travel time issues</li>
+    </ul>
+    <p>A composer agent then synthesises all five research packets into a 400-600 word script. The script goes through ElevenLabs TTS and drops into an RSS feed you can listen to on any podcast app.</p>`,
+    code: `<span class="comment"># Architecture overview</span>
+
+<span class="keyword">Pipeline</span>: Triage → Calendar → 5x Research Agents → Composer → TTS → RSS
+
+<span class="comment"># The five parallel research agents</span>
+agents = [
+    <span class="function">PeopleAgent</span>(<span class="string">"Search vault for every person in triage + calendar"</span>),
+    <span class="function">ProjectStatusAgent</span>(<span class="string">"Categorise tasks, find duplicates, spot quick wins"</span>),
+    <span class="function">ProjectHistoryAgent</span>(<span class="string">"Check last 14 days for task persistence"</span>),
+    <span class="function">ProjectContextAgent</span>(<span class="string">"Search notes and sources for project context"</span>),
+    <span class="function">CalendarAgent</span>(<span class="string">"Analyse scheduling conflicts and logistics"</span>),
+]
+
+<span class="comment"># All five run concurrently, then feed into the composer</span>
+research = <span class="keyword">await</span> asyncio.gather(*[a.run() <span class="keyword">for</span> a <span class="keyword">in</span> agents])
+script = <span class="keyword">await</span> <span class="function">ComposerAgent</span>(research).<span class="function">compose</span>()
+
+<span class="comment"># Voice: Lily (British female), ~2-3 min spoken</span>
+audio = elevenlabs.<span class="function">generate</span>(script, voice=<span class="string">"Lily"</span>)
+rss.<span class="function">publish</span>(audio)`,
+    tags: ['Automation', 'Multi-Agent', 'ElevenLabs', 'Python']
+  },
+  'assignment-prep': {
+    title: 'INSEAD Assignment Prep Agent',
+    author: 'Freddie Chambers',
+    avatar: 'FC',
+    color: 'linear-gradient(135deg, #667eea, #764ba2)',
+    time: '5 days ago',
+    votes: 98,
+    desc: `<p>You paste an assignment brief. The agent does the rest.</p>
+    <p>It identifies which course the assignment belongs to, then loads <em>every piece of material</em> from that course - lecture notes, reading summaries, frameworks, case studies, class discussion notes. It maps the question to relevant theoretical models, surfaces connections to other courses you might not think of, and identifies common pitfalls students fall into.</p>
+    <p>The output is a structured preparation brief: frameworks to consider, evidence from course materials with specific page references, potential counter-arguments, and a suggested approach structure. It doesn't write your assignment - it arms you so thoroughly that writing it becomes the easy part.</p>
+    <p>Has been used across UDJ, P&amp;M, OB, Accounting, and Strategy courses.</p>`,
+    code: `<span class="comment"># How it works</span>
+
+<span class="comment"># 1. Paste the assignment brief</span>
+<span class="keyword">Input</span>: "Analyse the pricing strategy of [Company X]
+        using frameworks from the course..."
+
+<span class="comment"># 2. Agent identifies the course and loads ALL materials</span>
+course = <span class="function">identify_course</span>(brief)  <span class="comment"># e.g. "Prices & Markets"</span>
+materials = <span class="function">load_course_materials</span>(course)
+<span class="comment"># Loads: lecture notes, readings, case studies,
+#        session transcripts, related vault notes</span>
+
+<span class="comment"># 3. Maps question to frameworks</span>
+frameworks = <span class="function">map_frameworks</span>(brief, materials)
+<span class="comment"># Output: "Price discrimination (Lecture 4),
+#          Conjoint analysis (Reading: Rao),
+#          Elasticity modelling (Session 7)"</span>
+
+<span class="comment"># 4. Surfaces cross-course connections</span>
+connections = <span class="function">find_cross_course</span>(brief, all_courses)
+<span class="comment"># Output: "OB - anchoring bias in price perception,
+#          UDJ - Bayesian updating on market signals"</span>
+
+<span class="comment"># 5. Generates prep brief with pitfalls</span>
+<span class="function">generate_prep_brief</span>(frameworks, connections, pitfalls)`,
+    tags: ['Agent', 'Learning', 'INSEAD', 'Claude Code']
+  },
+  'cv-workshop': {
+    title: 'CV Workshop Agent',
+    author: 'Freddie Chambers',
+    avatar: 'FC',
+    color: 'linear-gradient(135deg, #667eea, #764ba2)',
+    time: '1 week ago',
+    votes: 76,
+    desc: `<p>Paste a job description and your CV. The agent doesn't just "optimise" - it thinks strategically.</p>
+    <p>First it maps every requirement in the JD to your experience, flagging gaps and strengths. Then it does something unexpected: it searches broadly across everything you've ever written - course notes, transcripts, project documentation, even sports achievements - looking for "gold notes" you'd never think to connect to this role.</p>
+    <p>Maybe a leadership framework from your OB course perfectly articulates why you led a team the way you did. Maybe a competitive sports record demonstrates the resilience they're looking for. The agent surfaces 3-5 of these unexpected connections and explains exactly how to weave them in.</p>
+    <p>Then it workshops each CV bullet, showing its reasoning: <em>"This works because it quantifies impact AND signals the strategic thinking they need for a PM role."</em></p>`,
+    code: `<span class="comment"># The agent's discovery process</span>
+
+<span class="comment"># Phase 1: Map requirements</span>
+requirements = <span class="function">extract_requirements</span>(job_description)
+<span class="comment"># ["strategic thinking", "cross-functional leadership",
+#  "data-driven decisions", "stakeholder management"]</span>
+
+<span class="comment"># Phase 2: Deep vault search for "gold notes"</span>
+gold_notes = <span class="function">search_vault_broadly</span>(requirements)
+<span class="comment"># Finds: PLDP coach feedback on leadership style,
+#   Real tennis competition record (resilience signal),
+#   OB course framework on influence without authority,
+#   Transcript from industry speaker on PM career paths</span>
+
+<span class="comment"># Phase 3: Workshop each bullet</span>
+<span class="keyword">for</span> bullet <span class="keyword">in</span> cv.bullets:
+    <span class="function">workshop</span>(bullet, requirements, gold_notes)
+    <span class="comment"># Output includes:</span>
+    <span class="comment"># - Rewritten bullet</span>
+    <span class="comment"># - "Thinking: Why This Works" callout</span>
+    <span class="comment"># - Which requirements it addresses</span>
+    <span class="comment"># - Suggested gold note connections</span>`,
+    tags: ['Agent', 'Career', 'Claude Code']
+  },
+  'fin-model': {
+    title: 'Financial Modelling Copilot',
+    author: 'Joshua Dawe',
+    avatar: 'JD',
+    color: 'linear-gradient(135deg, #f093fb, #f5576c)',
+    time: '1 week ago',
+    votes: 84,
+    desc: `<p>A conversational agent that guides you through building financial models from scratch. Unlike a template, it teaches as it goes.</p>
+    <p>Tell it what you're modelling (e.g. "3-year DCF for a SaaS company with 40% YoY growth") and it walks through each assumption, explaining why you'd choose one approach over another. Challenges your inputs: "You're assuming 80% gross margins - that's aggressive for this vertical. Here's why..."</p>
+    <p>Built on Damodaran's valuation frameworks plus INSEAD Financial Markets and Valuation course materials. Supports DCF, LBO, comparable company analysis, and precedent transactions.</p>`,
+    code: `<span class="comment"># Example interaction</span>
+
+<span class="keyword">You</span>: Build a DCF for a B2B SaaS company,
+     Series B, $15M ARR, 40% growth
+
+<span class="keyword">Agent</span>: Let's start with revenue projections.
+
+  <span class="string">Year 1: $15M → $21M (40% growth)</span>
+  <span class="string">Year 2: $21M → $27.3M (30% - growth deceleration)</span>
+  <span class="string">Year 3: $27.3M → $32.8M (20%)</span>
+
+  <span class="comment">💡 I'm decelerating growth because B2B SaaS
+  companies at this scale typically see the
+  "Rule of 40" kick in. Here's why...</span>
+
+  Now let's discuss your WACC assumptions.
+  What's the risk-free rate you want to use?
+
+<span class="keyword">You</span>: 4.5%
+
+<span class="keyword">Agent</span>: That tracks the current 10Y Treasury.
+  For equity risk premium, Damodaran's latest
+  implied ERP is 4.6%. With a beta of 1.3
+  (typical for growth SaaS)...`,
+    tags: ['Agent', 'Finance', 'Learning']
+  },
+  'lecture-pipeline': {
+    title: 'Lecture Notes from PDF',
+    author: 'Freddie Chambers',
+    avatar: 'FC',
+    color: 'linear-gradient(135deg, #667eea, #764ba2)',
+    time: '2 days ago',
+    votes: 71,
+    desc: `<p>Drop a lecture handout PDF and get comprehensive, exam-ready study notes in under a minute.</p>
+    <p>The pipeline renders every page of the PDF as a high-resolution image (150 DPI), then batches them into groups of 8 pages. Each batch is processed by a parallel sub-agent that reads the slides visually - meaning it captures tables, diagrams, charts, and formatting that text extraction misses.</p>
+    <p>A main agent then loads the course context (previous lecture notes, the course syllabus, key frameworks) and stitches all the batch outputs into a single, coherent study document. Tables are reproduced as markdown. Diagrams are described in detail. Every concept is connected to the broader course narrative.</p>`,
+    code: `<span class="comment"># Processing pipeline</span>
+
+<span class="comment"># 1. Render PDF pages as images</span>
+pages = <span class="function">render_pdf</span>(handout, dpi=<span class="string">150</span>)
+<span class="comment"># 48 slides → 48 images</span>
+
+<span class="comment"># 2. Batch into groups of 8</span>
+batches = <span class="function">chunk</span>(pages, size=<span class="string">8</span>)
+<span class="comment"># 6 batches of 8 pages each</span>
+
+<span class="comment"># 3. Parallel sub-agents process each batch</span>
+<span class="keyword">for</span> batch <span class="keyword">in</span> batches:
+    <span class="function">SubAgent</span>(batch).<span class="function">read_and_synthesise</span>()
+    <span class="comment"># Each agent: reads images visually,</span>
+    <span class="comment"># writes prose study notes,</span>
+    <span class="comment"># reproduces tables as markdown,</span>
+    <span class="comment"># describes diagrams in detail</span>
+
+<span class="comment"># 4. Main agent stitches with course context</span>
+context = <span class="function">load_course</span>(<span class="string">"Prices & Markets"</span>)
+notes = <span class="function">stitch_and_contextualise</span>(batch_outputs, context)
+
+<span class="comment"># Output: comprehensive study notes in vault</span>`,
+    tags: ['Automation', 'Multi-Agent', 'Learning', 'PDF']
+  },
+  'public-sector': {
+    title: 'Policy Brief Generator',
+    author: 'Justin Foo',
+    avatar: 'JF',
+    color: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+    time: '4 days ago',
+    votes: 63,
+    desc: `<p>Takes any policy topic and generates a structured government-style brief in minutes. Maps stakeholders, synthesises evidence, models three scenarios, and identifies implementation risks.</p>
+    <p>Built from real-world experience deploying AI in the Singapore government - this follows the exact format used for ministerial briefings. Particularly strong for technology policy, public engagement strategy, and regulatory impact analysis.</p>`,
+    code: `<span class="comment"># Policy Brief Structure</span>
+
+<span class="keyword">Input</span>: "AI regulation for financial services in SEA"
+
+<span class="keyword">Output</span>:
+  <span class="string">1. Executive Summary</span> (3 sentences)
+  <span class="string">2. Stakeholder Map</span>
+     - Regulators (MAS, OJK, BSP...)
+     - Industry (banks, fintechs, insurers)
+     - Civil society (consumer groups, academia)
+  <span class="string">3. Evidence Synthesis</span>
+     - Academic sources
+     - Precedent from other jurisdictions
+     - Industry data points
+  <span class="string">4. Three Scenarios</span>
+     - Light touch (pros/cons/likelihood)
+     - Moderate (pros/cons/likelihood)
+     - Strict (pros/cons/likelihood)
+  <span class="string">5. Implementation Risks</span>
+  <span class="string">6. Recommended Approach</span>`,
+    tags: ['Prompt', 'Strategy', 'Policy']
+  },
+  'product-launch': {
+    title: 'Product Launch Brief Builder',
+    author: 'Sachin Pillay',
+    avatar: 'SP',
+    color: 'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+    time: '6 days ago',
+    votes: 58,
+    desc: `<p>A structured prompt chain that builds a complete go-to-market brief from a product description. Covers positioning, competitive landscape, channel strategy, messaging hierarchy, and launch timeline.</p>
+    <p>The prompt chain mirrors the actual GTM process used for Google Cloud and Gemini product launches. Each step builds on the previous, so the output is coherent rather than fragmented.</p>`,
+    code: `<span class="comment"># 4-step prompt chain</span>
+
+<span class="function">Step 1</span>: <span class="string">Product Positioning</span>
+  "Given [product], define the category,
+   target buyer persona, key differentiators,
+   and the one sentence that makes someone
+   stop scrolling."
+
+<span class="function">Step 2</span>: <span class="string">Competitive Landscape</span>
+  "Map direct and indirect competitors.
+   For each: positioning, pricing, weakness
+   we can exploit. Output as battlecard."
+
+<span class="function">Step 3</span>: <span class="string">Channel Strategy</span>
+  "Given positioning + competitive landscape,
+   recommend channels ranked by expected CAC
+   and time-to-impact. Include messaging
+   variations per channel."
+
+<span class="function">Step 4</span>: <span class="string">Launch Timeline</span>
+  "Build a 12-week launch plan with milestones,
+   owners (roles not names), dependencies,
+   and a pre-mortem of what could go wrong."`,
+    tags: ['Workflow', 'Marketing', 'Strategy']
+  },
+  'case-cracker': {
+    title: 'Case Interview Sparring Partner',
+    author: 'Liyang Guo',
+    avatar: 'LG',
+    color: 'linear-gradient(135deg, #ffecd2, #fcb69f)',
+    time: '1 week ago',
+    votes: 52,
+    desc: `<p>A conversational agent that runs realistic case interviews. Unlike basic chatbots, this one actually pushes back - it challenges weak structuring, asks pointed follow-ups, and won't let you hand-wave through the maths.</p>
+    <p>Configure for target firm type (MBB, Big 4, boutique strategy), industry focus, and difficulty. It scores you on structure, hypothesis quality, quantitative reasoning, and communication. After the case, it gives specific, actionable feedback.</p>`,
+    code: `<span class="comment"># Configuration</span>
+
+<span class="keyword">Settings</span>:
+  firm_type: <span class="string">"MBB"</span>
+  difficulty: <span class="string">"intermediate"</span>
+  industry: <span class="string">"healthcare"</span>
+  style: <span class="string">"interviewer-led"</span>
+
+<span class="comment"># The agent's scoring rubric</span>
+<span class="function">Structure</span>     (1-5): MECE, hypothesis-driven
+<span class="function">Creativity</span>    (1-5): Non-obvious insights
+<span class="function">Quant</span>         (1-5): Back-of-envelope accuracy
+<span class="function">Communication</span> (1-5): Clear, executive-ready
+
+<span class="comment"># Example pushback behaviour</span>
+<span class="keyword">You</span>: "We should segment by geography"
+<span class="keyword">Agent</span>: "Why geography and not customer type?
+  Walk me through what geography tells us
+  that a customer segmentation wouldn't."`,
+    tags: ['Agent', 'Career', 'Consulting']
+  },
+  'vibe-coder': {
+    title: 'MVP Builder Prompt Chain',
+    author: 'Bhaskar Venkatraman',
+    avatar: 'BV',
+    color: 'linear-gradient(135deg, #43e97b, #38f9d7)',
+    time: '1 day ago',
+    votes: 45,
+    desc: `<p>Go from "I have an idea" to a deployed, functional prototype without writing a line of code yourself. This structured prompt chain handles concept validation, data modelling, full-stack scaffolding, and deployment.</p>
+    <p>Non-technical founders on the IVC track have used this to ship real MVPs in under 3 hours. The key insight: each prompt builds on the previous output, so the AI maintains architectural coherence throughout.</p>`,
+    code: `<span class="comment"># The chain</span>
+
+<span class="function">Prompt 1</span>: <span class="string">Concept Validation</span>
+  "Here's my idea: [X]. Tell me the 3 riskiest
+   assumptions and design the simplest possible
+   MVP that tests them. No feature creep."
+
+<span class="function">Prompt 2</span>: <span class="string">Data Model</span>
+  "Based on the validated MVP scope, design the
+   database schema. Use Supabase/Postgres.
+   Include auth, the core domain, and nothing else."
+
+<span class="function">Prompt 3</span>: <span class="string">Full-Stack Scaffold</span>
+  "Build the complete app. Next.js + Tailwind +
+   Supabase. Deploy-ready. Include auth flow,
+   core CRUD, and a landing page that explains
+   the value prop in one sentence."
+
+<span class="function">Prompt 4</span>: <span class="string">Deploy</span>
+  "Push to GitHub and deploy to Vercel.
+   Set up environment variables, configure
+   Supabase connection, verify it works."`,
+    tags: ['Workflow', 'Vibe Coding', 'IVC']
+  },
+  'ops-agent': {
+    title: 'Operations Bottleneck Finder',
+    author: 'Sienna Belda',
+    avatar: 'SB',
+    color: 'linear-gradient(135deg, #fa709a, #fee140)',
+    time: '5 days ago',
+    votes: 41,
+    desc: `<p>Upload a process description, ops data, or even a hand-drawn process flow and it maps the entire workflow. Then it applies Theory of Constraints to identify the bottleneck, calculates throughput impact, and recommends where AI automation would give the highest ROI.</p>
+    <p>Built for Process &amp; Operations Management assignments but works for any operational analysis. Particularly strong at identifying non-obvious bottlenecks that aren't the slowest step.</p>`,
+    code: `<span class="comment"># Example analysis</span>
+
+<span class="keyword">Input</span>: "Restaurant kitchen process:
+  Order → Prep (3min) → Cook (8min) →
+  Plate (2min) → QC (1min) → Serve (1min)
+  2 prep stations, 1 stove, 1 plating station"
+
+<span class="keyword">Output</span>:
+  <span class="function">Bottleneck</span>: Cooking (8 min, 1 station)
+  <span class="function">Throughput</span>: 7.5 orders/hour
+  <span class="function">Utilisation</span>:
+    Prep:    <span class="string">25%</span> (over-resourced)
+    Cook:    <span class="string">100%</span> ← constraint
+    Plate:   <span class="string">27%</span>
+    QC:      <span class="string">13%</span>
+
+  <span class="function">AI Automation Opportunities</span>:
+  1. Predictive prep (start cooking based on
+     order patterns) - <span class="string">+15% throughput</span>
+  2. Automated QC via computer vision
+     - <span class="string">frees 1 FTE</span>`,
+    tags: ['Prompt', 'Operations', 'Learning']
+  },
+  'daily-triage': {
+    title: 'Daily Task Triage System',
+    author: 'Freddie Chambers',
+    avatar: 'FC',
+    color: 'linear-gradient(135deg, #667eea, #764ba2)',
+    time: '1 week ago',
+    votes: 38,
+    desc: `<p>Every morning, this automation pulls your task inbox, carries forward anything unfinished, flags items that have been sitting too long, and generates a clean decision board with four categories:</p>
+    <ul style="margin:12px 0; padding-left:20px; color:var(--ink-light); line-height:1.8;">
+      <li><strong>Do</strong> - Acting on today</li>
+      <li><strong>Keen</strong> - Want to do, not urgent</li>
+      <li><strong>Park</strong> - Deliberately deferring</li>
+      <li><strong>Kill</strong> - Not doing, removing</li>
+    </ul>
+    <p>Previous decisions are automatically processed - items you marked "Do" yesterday get checked for completion. Items you "Parked" three times get flagged. Pairs perfectly with the Morning Briefing for a full "AI chief of staff" start to your day.</p>`,
+    code: `<span class="comment"># Triage workflow</span>
+
+<span class="comment"># 1. Load previous triage decisions</span>
+previous = <span class="function">load_previous_triage</span>()
+<span class="comment"># Processes: Do items → check if done</span>
+<span class="comment">#           Park items → carry forward</span>
+<span class="comment">#           Kill items → archive</span>
+
+<span class="comment"># 2. Pull current task inbox</span>
+tasks = <span class="function">load_daily_materials</span>()
+<span class="comment"># Sources: tasks, resources, ideas from vault</span>
+
+<span class="comment"># 3. Generate fresh triage note</span>
+<span class="function">generate_triage</span>({
+  format: <span class="string">"Do / Keen / Park / Kill / Done"</span>,
+  flags: [
+    <span class="string">"Items parked 3+ times"</span>,
+    <span class="string">"Items older than 14 days"</span>,
+    <span class="string">"Quick wins (< 15 min)"</span>,
+  ],
+  output: <span class="string">"Morning Triage/{DD-MM-YY}.md"</span>
+})`,
+    tags: ['Automation', 'Productivity']
+  },
+  'voice-bot': {
+    title: 'AI Voice Agent Template',
+    author: 'Saurabh Bhatia',
+    avatar: 'SB',
+    color: 'linear-gradient(135deg, #ff9a9e, #fad0c4)',
+    time: '2 days ago',
+    votes: 33,
+    desc: `<p>A starter kit for building conversational voice agents from scratch. Covers the full pipeline: personality design, speech-to-text, response generation, and text-to-speech output.</p>
+    <p>Includes a working example that answers questions about your INSEAD course schedule. Designed for non-engineers - the template handles the infrastructure so you can focus on the conversation design. Built from experience creating voice bots and visual cataloguing tools in B2B SaaS.</p>`,
+    code: `<span class="comment"># Voice Agent Template Structure</span>
+
+<span class="function">1. Personality Config</span>
+  name: <span class="string">"Your Agent"</span>
+  voice: <span class="string">"alloy"</span>  <span class="comment"># or: echo, fable, onyx, nova, shimmer</span>
+  traits:
+    warmth: <span class="string">0.8</span>
+    formality: <span class="string">0.3</span>
+    verbosity: <span class="string">0.4</span>
+
+<span class="function">2. Knowledge Base</span>
+  sources: [<span class="string">"course_schedule.json"</span>, <span class="string">"faq.md"</span>]
+  retrieval: <span class="string">"semantic search"</span>
+
+<span class="function">3. Pipeline</span>
+  <span class="string">Audio In</span> → Whisper STT → Claude → ElevenLabs TTS → <span class="string">Audio Out</span>
+
+  latency_target: <span class="string">"< 2 seconds"</span>
+  streaming: <span class="string">true</span>
+
+<span class="function">4. Example Interaction</span>
+  <span class="keyword">User</span>: "What do I have tomorrow morning?"
+  <span class="keyword">Agent</span>: "You've got Prices and Markets at 8:30
+          in Amphitheatre 1, then a free block
+          until your study group at 11."`,
+    tags: ['Template', 'Agent', 'Voice AI']
+  }
+};
+
+function openModal(toolId) {
+  const data = toolData[toolId];
+  if (!data) return;
+
+  document.getElementById('modalTitle').textContent = data.title;
+  document.getElementById('modalAuthor').innerHTML = `
+    <span class="avatar" style="background: ${data.color}; width:24px; height:24px; font-size:11px;">${data.avatar}</span>
+    ${data.author} &middot; ${data.time} &middot; ${data.votes} upvotes
+  `;
+
+  let tagsHtml = data.tags.map(t => {
+    let cls = 'tool-tag';
+    if (t === 'Agent' || t === 'Multi-Agent') cls += ' type-agent';
+    else if (t === 'Prompt') cls += ' type-prompt';
+    else if (t === 'Workflow') cls += ' type-workflow';
+    else if (t === 'Automation') cls += ' type-automation';
+    else if (t === 'Template') cls += ' type-template';
+    return `<span class="${cls}">${t}</span>`;
+  }).join('');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap;">${tagsHtml}</div>
+    <div class="modal-desc">${data.desc}</div>
+    <div class="modal-section-title">How it works</div>
+    <div class="modal-code">${data.code}</div>
+    <div class="modal-actions">
+      <button class="modal-btn primary">&#x1F500; Fork this tool</button>
+      <button class="modal-btn">&#9650; Upvote</button>
+      <button class="modal-btn">&#x1F4AC; Discussion</button>
+      <button class="modal-btn">&#x1F517; Share</button>
+    </div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
