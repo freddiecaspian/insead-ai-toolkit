@@ -1,0 +1,3384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSEAD 26D - Birthday Calendar</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #1a1a2e;
+  --ink-light: #536471;
+  --ink-faint: #8899a6;
+  --surface: #ffffff;
+  --bg: #faf8f5;
+  --card-bg: #ffffff;
+  --border: #e1e8ed;
+  --border-light: #eef0f2;
+  --accent: #1d9bf0;
+  --fonty: #1e3a5f;
+  --fonty-bg: #e8eef5;
+  --fonty-border: #b8cce0;
+  --singy: #c2610a;
+  --singy-bg: #fef3e6;
+  --singy-border: #f0c896;
+  --green: #00ba7c;
+  --pink: #e8457a;
+  --purple: #7856ff;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e7e9ea;
+    --ink-light: #a0aab4;
+    --ink-faint: #6e7a85;
+    --surface: #1a1a2e;
+    --bg: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --border: #2f2f4a;
+    --border-light: #252540;
+    --accent: #4da6ff;
+    --fonty: #7fb3e0;
+    --fonty-bg: #1a2a3f;
+    --fonty-border: #2d4a6a;
+    --singy: #f0a050;
+    --singy-bg: #2f2218;
+    --singy-border: #5a3a1a;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 60px;
+}
+
+/* Topbar */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,248,245,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+@media (prefers-color-scheme: dark) {
+  .topbar { background: rgba(15,15,26,0.92); }
+}
+.topbar-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; height: 52px;
+}
+.topbar-title { font-size: 15px; font-weight: 700; }
+.topbar-date { font-size: 13px; color: var(--ink-light); }
+
+/* Hero */
+.hero { text-align: center; padding: 40px 20px 24px; max-width: 720px; margin: 0 auto; }
+.hero h1 {
+  font-size: 28px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--fonty), var(--singy));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero p { font-size: 14px; color: var(--ink-light); }
+
+/* Controls */
+.controls {
+  max-width: 720px; margin: 0 auto 20px; padding: 0 20px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.search-box {
+  flex: 1; min-width: 160px; padding: 9px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 14px; background: var(--card-bg); color: var(--ink); outline: none;
+}
+.search-box:focus { border-color: var(--accent); }
+.filter-btn {
+  padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; background: var(--card-bg); color: var(--ink-light);
+  cursor: pointer; transition: all var(--transition);
+}
+.filter-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+.filter-btn.active { background: var(--ink); color: var(--card-bg); border-color: var(--ink); }
+@media (prefers-color-scheme: dark) {
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+}
+
+/* Tab bar */
+.tabs {
+  max-width: 720px; margin: 0 auto 20px; padding: 0 20px;
+  display: flex; gap: 0; border-bottom: 2px solid var(--border);
+}
+.tab {
+  padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+  color: var(--ink-faint); border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: all var(--transition); background: none; border-top: none; border-left: none; border-right: none;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* Timeline container */
+.timeline { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+/* Timeline row */
+.tl-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; margin-bottom: 6px;
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+  transition: all var(--transition); cursor: default;
+}
+.tl-row:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.tl-row.is-today {
+  border-color: var(--pink);
+  background: linear-gradient(135deg, #fff5f7, #fff);
+}
+@media (prefers-color-scheme: dark) {
+  .tl-row.is-today { background: linear-gradient(135deg, #2a1a22, var(--card-bg)); }
+}
+
+/* Days badge */
+.tl-days {
+  min-width: 56px; text-align: center;
+  padding: 6px 4px; border-radius: var(--radius-sm);
+  font-weight: 800; font-size: 13px; line-height: 1.2;
+  flex-shrink: 0;
+}
+.tl-days .num { font-size: 20px; display: block; }
+.tl-days .label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; }
+.tl-days.today { background: var(--pink); color: #fff; }
+.tl-days.soon { background: #fff0f5; color: var(--pink); }
+@media (prefers-color-scheme: dark) { .tl-days.soon { background: #2a1a22; } }
+.tl-days.mid { background: var(--fonty-bg); color: var(--fonty); }
+.tl-days.far { background: var(--border-light); color: var(--ink-faint); }
+
+/* Progress bar */
+.tl-bar-wrap {
+  flex: 1; min-width: 0;
+}
+.tl-name-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+}
+.tl-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-linkedin {
+  color: var(--ink-faint); text-decoration: none; flex-shrink: 0;
+  opacity: 0.5; transition: opacity var(--transition);
+}
+.tl-linkedin:hover { opacity: 1; color: var(--accent); }
+.tl-meta {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-light);
+}
+.tl-date { font-weight: 600; }
+.tl-bar {
+  height: 4px; background: var(--border-light); border-radius: 2px;
+  margin-top: 6px; overflow: hidden;
+}
+.tl-bar-fill {
+  height: 100%; border-radius: 2px; transition: width 0.6s ease;
+}
+
+/* Campus badge */
+.campus { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.campus-fonty { background: var(--fonty-bg); color: var(--fonty); border: 1px solid var(--fonty-border); }
+.campus-singy { background: var(--singy-bg); color: var(--singy); border: 1px solid var(--singy-border); }
+
+/* Section headers in timeline */
+.tl-section-header {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--ink-faint); padding: 16px 0 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tl-section-header::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Stats section */
+.stats { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+.stats-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--ink-faint); padding: 16px 0 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.stats-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 4px; }
+.stat-value { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.stat-sub { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+.stats-wide {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px 18px; box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+}
+.stats-wide h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 10px; }
+
+/* Bar chart rows */
+.zbar { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.zbar-label { font-size: 11px; width: 80px; text-align: right; color: var(--ink-light); white-space: nowrap; overflow: hidden; }
+.zbar-track { flex: 1; height: 16px; background: var(--border-light); border-radius: 3px; overflow: hidden; }
+.zbar-fill { height: 100%; border-radius: 3px; min-width: 2px; }
+.zbar-val { font-size: 10px; font-weight: 700; width: 20px; color: var(--ink-faint); }
+
+/* Heatmap */
+.heat { display: grid; grid-template-columns: auto repeat(12, 1fr); gap: 3px; font-size: 10px; }
+.heat-hdr { font-weight: 700; text-align: center; color: var(--ink-faint); padding: 3px 1px; }
+.heat-lbl { font-weight: 600; padding: 3px 6px 3px 0; text-align: right; white-space: nowrap; }
+.heat-cell { border-radius: 3px; text-align: center; padding: 4px 1px; font-weight: 600; }
+
+/* Twins */
+.twins-row { padding: 5px 0; border-bottom: 1px solid var(--border-light); font-size: 12px; }
+.twins-row:last-child { border-bottom: none; }
+.twins-date { font-weight: 700; color: var(--accent); }
+
+/* Mystery */
+.mystery { max-width: 720px; margin: 20px auto; padding: 0 20px; }
+.mystery-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); padding: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+.mystery-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.mystery-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.mystery-chip {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 5px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 5px;
+}
+.mystery-chip a { color: var(--ink-faint); text-decoration: none; }
+.mystery-chip a:hover { color: var(--accent); }
+
+/* Footer */
+.footer {
+  text-align: center; padding: 24px 20px; font-size: 11px; color: var(--ink-faint);
+  max-width: 720px; margin: 0 auto;
+}
+
+/* Empty state */
+.empty { text-align: center; padding: 40px 20px; color: var(--ink-faint); font-size: 14px; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 22px; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .controls { flex-direction: column; }
+  .search-box { width: 100%; }
+  .tl-row { padding: 10px 12px; gap: 10px; }
+  .tl-days { min-width: 48px; }
+  .tl-days .num { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="topbar-title">26D Birthdays</span>
+    <span class="topbar-date" id="topbar-date"></span>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>INSEAD 26D Birthday Calendar</h1>
+  <p id="hero-sub">Loading...</p>
+</div>
+
+<div class="controls">
+  <input type="text" class="search-box" id="search-input" placeholder="Search by name...">
+  <button class="filter-btn active" data-campus="all" onclick="setCampus('all')">All</button>
+  <button class="filter-btn" data-campus="Fonty" onclick="setCampus('Fonty')">Fonty</button>
+  <button class="filter-btn" data-campus="Singy" onclick="setCampus('Singy')">Singy</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setView('timeline')">Timeline</button>
+  <button class="tab" onclick="setView('stats')">Stats</button>
+</div>
+
+<div id="timeline-view">
+  <div class="timeline" id="timeline-container"></div>
+  <div class="mystery" id="mystery-container"></div>
+</div>
+
+<div id="stats-view" style="display:none">
+  <div class="stats" id="stats-container"></div>
+</div>
+
+<div class="footer">Made for the INSEAD 26D cohort</div>
+
+<script>
+const PEOPLE = [
+  {
+    "name": "Thiago",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 25,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/thiago-sardo/"
+  },
+  {
+    "name": "Saurabh Bhatia",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 2,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/saurabh-bhatia02"
+  },
+  {
+    "name": "Justin Foo",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/justin-foo-zk"
+  },
+  {
+    "name": "Nick Samaras",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 5,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/nikolaos-samaras-871237b4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Javier Del Rio Torres",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 3,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/javierignaciodelrio"
+  },
+  {
+    "name": "Clara Herberg Fernandez",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 5,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/clara-herberg/"
+  },
+  {
+    "name": "Henry Mutschler",
+    "campus": "Singy",
+    "month": 1,
+    "day": 21,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/henry-mutschler"
+  },
+  {
+    "name": "Tina Ghosn",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 20,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/tina-ghosn?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Ibrahim Boukabache",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 7,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://LinkedIn.com/in/ibrahimboukabache"
+  },
+  {
+    "name": "Matheus Balieiro Figueiredo",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 19,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://linkedin/matheusbalieiro"
+  },
+  {
+    "name": "Daniel Hwang",
+    "campus": "Singy",
+    "month": 9,
+    "day": 2,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/daniel-hwang-cfa"
+  },
+  {
+    "name": "Soumalya Kundu",
+    "campus": "Singy",
+    "month": 3,
+    "day": 28,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/soumalyakundu"
+  },
+  {
+    "name": "Hiroshi Yatabe",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 27,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/hiroshi-yatabe/"
+  },
+  {
+    "name": "Ravi Pratap",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 10,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/maj-ravipratap"
+  },
+  {
+    "name": "Sarina Trinh",
+    "campus": "Singy",
+    "month": 1,
+    "day": 7,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/trinhthanhha/"
+  },
+  {
+    "name": "Shaun Tan",
+    "campus": "Singy",
+    "month": 1,
+    "day": 27,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/tanshaun95"
+  },
+  {
+    "name": "Emmanuel Franco",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 9,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/francoemmanuel"
+  },
+  {
+    "name": "Luis Enrique Blas Barba",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 31,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://es.linkedin.com/in/luis-enrique-blas-barba"
+  },
+  {
+    "name": "Jonas Bruns",
+    "campus": "Singy",
+    "month": 10,
+    "day": 27,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/brunsj/"
+  },
+  {
+    "name": "Annabelle Timsit",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://LinkedIn.com/in/annabelletimsit/"
+  },
+  {
+    "name": "Roshni Chandralekha Sreekumaran Nair",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 2,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "http://linkedin.com/in/roshni-cs-0b6993192"
+  },
+  {
+    "name": "Dhairya Jain",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 12,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/dhairyaj"
+  },
+  {
+    "name": "Tanya Saharya",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 16,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/tanyasaharya"
+  },
+  {
+    "name": "Mahi Viragi",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/mviragi"
+  },
+  {
+    "name": "Farhan Merchant",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 31,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/merchantfarhan"
+  },
+  {
+    "name": "Gabrielle Jabre",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/jabgabrielle"
+  },
+  {
+    "name": "Shubham Shukla",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 4,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "http://linkedin.com/in/shubham44shukla"
+  },
+  {
+    "name": "Thierry Uy Tiv",
+    "campus": "Singy",
+    "month": 5,
+    "day": 24,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/thierryuytiv/"
+  },
+  {
+    "name": "Amanda Chermont Tavares da Silva",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 27,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/amanda-chermont-26609259?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Alessandro Chelala",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/alessandro-chelala"
+  },
+  {
+    "name": "Kiu Yeung",
+    "campus": "Singy",
+    "month": 9,
+    "day": 3,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/kiu-yeung"
+  },
+  {
+    "name": "Nichamon Damrongkitkarn",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 30,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/nichamon-damrongkitkarn-41183115a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Hwanggwang Rew",
+    "campus": "Singy",
+    "month": 10,
+    "day": 28,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/hwanggwangrew/"
+  },
+  {
+    "name": "Afrida Kamal",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 28,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/afrida-kamal"
+  },
+  {
+    "name": "Anushka Shivani",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/anushka-shivani"
+  },
+  {
+    "name": "Shaun Sik",
+    "campus": "Singy",
+    "month": 8,
+    "day": 8,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/shaun-sik/"
+  },
+  {
+    "name": "Amr Ibrahim",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 8,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "http://linkedin.com/in/amrashraf545"
+  },
+  {
+    "name": "Chirag Jain",
+    "campus": "Singy",
+    "month": 5,
+    "day": 22,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/chiragjain9/"
+  },
+  {
+    "name": "Minh Anh Dao",
+    "campus": "Singy",
+    "month": 10,
+    "day": 10,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/daominhanh10/"
+  },
+  {
+    "name": "Javier Galardi Garcia",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 28,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/javiergalardigarcia"
+  },
+  {
+    "name": "Emma Lee",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 10,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/emma-lee-a4261415b"
+  },
+  {
+    "name": "Safira Lee",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 26,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/safira-lee"
+  },
+  {
+    "name": "Shreyash Dwivedi",
+    "campus": "Singy",
+    "month": 7,
+    "day": 17,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/shreyash-s-d-50521a191?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Baron Sudharta",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 26,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/baron-sudharta"
+  },
+  {
+    "name": "Yuxiang Kok",
+    "campus": "Singy",
+    "month": 7,
+    "day": 24,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "http://linkedin.com/in/yu-xiang-k-81a11b107"
+  },
+  {
+    "name": "Bhargav Joshi",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/bhargav-joshi-swdev"
+  },
+  {
+    "name": "Alice Liu",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 27,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/tzechunliu"
+  },
+  {
+    "name": "Meryll Solidum",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 7,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/meryllsolidum"
+  },
+  {
+    "name": "Clare Loo",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 24,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "http://linkedin.com/in/clare-amanda-loo-93913a8a"
+  },
+  {
+    "name": "Kaai Kim",
+    "campus": "Singy",
+    "month": 11,
+    "day": 20,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "http://linkedin.com/in/kaai-kim"
+  },
+  {
+    "name": "Emma Louise Teisen",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 6,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/emma-louise-teisen-804257161"
+  },
+  {
+    "name": "Andrew Rogozinski",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 18,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/andrew-rogozinski"
+  },
+  {
+    "name": "Idriss El Hajji",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/idriss-el-hajji/"
+  },
+  {
+    "name": "Helena Alvarez Garcia",
+    "campus": "Singy",
+    "month": 11,
+    "day": 21,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/h-alvarezgarcia/"
+  },
+  {
+    "name": "Leon Burg",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 16,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/leonburg"
+  },
+  {
+    "name": "Poorna Agarwal",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 5,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/poornaagarwal?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Shayan Anvar Ismail",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 6,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/shayananvar"
+  },
+  {
+    "name": "Matias Haussmann",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 10,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://Linkedin.com/in/matias-haussmann/"
+  },
+  {
+    "name": "Tommy Kim",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 19,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/tommy-hyunho-kim"
+  },
+  {
+    "name": "Michael Scott",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 19,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/michael-david-scott2/"
+  },
+  {
+    "name": "Vinayak Kalra",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 20,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/vinayakkalra/"
+  },
+  {
+    "name": "Inigo Carro",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/inigocarro"
+  },
+  {
+    "name": "Xenia Postnikova",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 9,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/oxanapostnikova/"
+  },
+  {
+    "name": "Johannes Orssich",
+    "campus": "Singy",
+    "month": 4,
+    "day": 25,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "http://linkedin.com/in/johannesorssich"
+  },
+  {
+    "name": "Quynh Nguyen",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 12,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/ndxquynh"
+  },
+  {
+    "name": "Jason Tan Pei Sheng",
+    "campus": "Singy",
+    "month": 7,
+    "day": 22,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/jasontps/"
+  },
+  {
+    "name": "Anupendra Singh",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 19,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/anupendrasingh/"
+  },
+  {
+    "name": "Sophia Azzagnuni",
+    "campus": "Singy",
+    "month": 3,
+    "day": 18,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/sophia-azzagnuni/"
+  },
+  {
+    "name": "Nadir Omar",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "http://linkedin.com/in/nadir-omar-09267912b"
+  },
+  {
+    "name": "Lucile Poitevin",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 9,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/lucile-poitevin"
+  },
+  {
+    "name": "Hee Jin Kim",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 1,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/hee-jin-kim-137297140/"
+  },
+  {
+    "name": "Ailan Jiang",
+    "campus": "Singy",
+    "month": 3,
+    "day": 21,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/ailanjiang"
+  },
+  {
+    "name": "Matthew Mangan",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 29,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/matthew-mangan-607a57178/"
+  },
+  {
+    "name": "Takeshi Yamamoto",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 24,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/takeshi-yamamoto-53577b12a/"
+  },
+  {
+    "name": "Maya Duggal",
+    "campus": "Singy",
+    "month": 6,
+    "day": 2,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/maya-duggal-9394b2ab"
+  },
+  {
+    "name": "Siena Belda",
+    "campus": "Singy",
+    "month": 7,
+    "day": 24,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/siena-belda"
+  },
+  {
+    "name": "Darshita Devnani",
+    "campus": "Singy",
+    "month": 7,
+    "day": 7,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/darshitadevnani/"
+  },
+  {
+    "name": "Alioune Sanogo",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 28,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/alioune-sanogo-9314565b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Tuya Batbold",
+    "campus": "Singy",
+    "month": 1,
+    "day": 26,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/enkhtuya-batbold"
+  },
+  {
+    "name": "Hiro Kaji",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 2,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/hironobu-kaji-013389318"
+  },
+  {
+    "name": "Raphaël Henry",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/raphael-henry-/"
+  },
+  {
+    "name": "Felix Huang",
+    "campus": "Singy",
+    "month": 2,
+    "day": 24,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/wlhuang/"
+  },
+  {
+    "name": "Nigel Tan",
+    "campus": "Singy",
+    "month": 5,
+    "day": 30,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/nigelxy"
+  },
+  {
+    "name": "Sanam Nanwani",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 4,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/sanamnanwani/"
+  },
+  {
+    "name": "Dimple Raja",
+    "campus": "Singy",
+    "month": 5,
+    "day": 19,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/dimple-raja/"
+  },
+  {
+    "name": "Noor Majdalani",
+    "campus": "Singy",
+    "month": 10,
+    "day": 28,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/noormajdalani?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Constantin Suess",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/constantin-s-5719547b/"
+  },
+  {
+    "name": "Aima Qureshi",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 10,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://bh.linkedin.com/in/aima-qureshi"
+  },
+  {
+    "name": "Sarah El Fil",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 25,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "http://linkedin.com/in/sarahelfil"
+  },
+  {
+    "name": "Mariana Alvaro Melo",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 14,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/mariana-alvaro/"
+  },
+  {
+    "name": "Giorgi Khukhunaishvili",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://ge.linkedin.com/in/giorgi-khukhunaishvili"
+  },
+  {
+    "name": "Granado Granado",
+    "campus": "Singy",
+    "month": 12,
+    "day": 28,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/leonardo-fortes-granado-748ba0135?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+  },
+  {
+    "name": "Noa Schork",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 11,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/noa-schork"
+  },
+  {
+    "name": "Christina Chen",
+    "campus": "Singy",
+    "month": 8,
+    "day": 5,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://linkedin.com/in/xtinachen"
+  },
+  {
+    "name": "Nick Colbourne",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 5,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/nick-colbourne"
+  },
+  {
+    "name": "Naia Bengoa San Sebastian",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 10,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "http://linkedin.com/in/naiabengoa"
+  },
+  {
+    "name": "Tara Kuhnt",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 10,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/tara"
+  },
+  {
+    "name": "Ria Nagar",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/ria-nagar-b34923134?utm_source=share_via&utm_content=profile&utm_medium=member_ios"
+  },
+  {
+    "name": "Alicia Sim",
+    "campus": "Singy",
+    "month": 3,
+    "day": 8,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/aliciasimssj/"
+  },
+  {
+    "name": "Zhaohong Wang",
+    "campus": "Singy",
+    "month": 11,
+    "day": 18,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/zhaohong-wang-59b694b0/"
+  },
+  {
+    "name": "Ali Zayour",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 14,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/zayourali"
+  },
+  {
+    "name": "Nurmukhamed Mussayev",
+    "campus": "Singy",
+    "month": 4,
+    "day": 20,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/mussayevn/"
+  },
+  {
+    "name": "Marcello Zhang",
+    "campus": "Singy",
+    "month": 9,
+    "day": 20,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/marcello-zhang-6373a7181"
+  },
+  {
+    "name": "Kian Müller-Menrad",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://de.linkedin.com/in/kian-müller-menrad"
+  },
+  {
+    "name": "Mathew Koshy",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/mathewko"
+  },
+  {
+    "name": "Hans Sjögren Novikov",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": ""
+  },
+  {
+    "name": "Inés Torremocha Gaytán de Ayala",
+    "campus": "Singy",
+    "month": 8,
+    "day": 29,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/inés-torremocha-gaytan-de-ayala"
+  },
+  {
+    "name": "Khyati Sunil Davey",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/khyati-davey?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Max Dear",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/max-dear/"
+  },
+  {
+    "name": "Fernando Amaral",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 20,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/fernando-amaral-2a0940164/"
+  },
+  {
+    "name": "Navya Pathak",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 19,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/-navya-pathak"
+  },
+  {
+    "name": "Ladislao Gostuski",
+    "campus": "Singy",
+    "month": 5,
+    "day": 14,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/ladislaogostuski/"
+  },
+  {
+    "name": "Marushka Hirshon",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 22,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/marushkahirshon"
+  },
+  {
+    "name": "Alistair Fila",
+    "campus": "Singy",
+    "month": 9,
+    "day": 18,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/alistairfila/"
+  },
+  {
+    "name": "Yunjeng Lee",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 14,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/yunjeng-lee-6bb544b1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Ivan Bolanos Bolanos",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 14,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/ivanbolanos/"
+  },
+  {
+    "name": "Rodrigo Falcón Cortavarría",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 12,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://linkedin.com/in/rodrigo-falcon"
+  },
+  {
+    "name": "Hayley Chung",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "http://linkedin.com/in/hayley-chung"
+  },
+  {
+    "name": "Alejandro Michel Marron",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 18,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/alejandromichel/"
+  },
+  {
+    "name": "Anthonio Choucair",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 9,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/anthonio-choucair-21656a171?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Manuel Alvarez-Requejo Heredero",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 29,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/manuelalvarezrequejoheredero?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Spandan Das",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 12,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/spandan96"
+  },
+  {
+    "name": "Julien Trehet",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 9,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://uk.linkedin.com/in/julientrehet"
+  },
+  {
+    "name": "Konstance Lim",
+    "campus": "Singy",
+    "month": 9,
+    "day": 14,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/konstancelim/"
+  },
+  {
+    "name": "Toyosi Onabanjo",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 9,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/oluwatoyosi-onabanjo?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Wale Kuku",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "http://linkedin.com/in/r-olawale-kuku-128953255"
+  },
+  {
+    "name": "Alessandro Franchino",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 29,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/alessandro-franchino"
+  },
+  {
+    "name": "Majed Al-Ansari",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 7,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "http://linkedin.com/in/majedal-ansari"
+  },
+  {
+    "name": "Dominik Fübi",
+    "campus": "Singy",
+    "month": 7,
+    "day": 3,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/dominik-f%C3%BCbi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Antonio Di Lorenzo",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 27,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "http://www.linkedin.com/in/antonio-dilorenzo"
+  },
+  {
+    "name": "Fatima Dashe",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 29,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/fatima-dashe"
+  },
+  {
+    "name": "Isabel Wrubel",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 7,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/isabel-wrubel"
+  },
+  {
+    "name": "Khaled Salam",
+    "campus": "Singy",
+    "month": 8,
+    "day": 2,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/khaledsalamgartner?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Carlo Babini",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 27,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/carlo-babini-1145bb119?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Marta Vela Cañamero",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 19,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/martavelacanamero"
+  },
+  {
+    "name": "Remy Otayek",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 2,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": ""
+  },
+  {
+    "name": "Ronan Afrifa",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 23,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "http://linkedin.com/in/ronan-a-a58b2258"
+  },
+  {
+    "name": "Jacques Poirier",
+    "campus": "Singy",
+    "month": 2,
+    "day": 20,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/jacques-poirier-33291b192"
+  },
+  {
+    "name": "Jayley Chan",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 27,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/jialechan"
+  },
+  {
+    "name": "Marcela Sircili Maddarena",
+    "campus": "Singy",
+    "month": 10,
+    "day": 30,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/marcela-maddarena"
+  },
+  {
+    "name": "Henry Tilbury",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/henry-tilbury-2a239767/"
+  },
+  {
+    "name": "Aroushi Murthy",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 30,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/aroushi-murthy-61718a99/"
+  },
+  {
+    "name": "Maria Velasco Galaz",
+    "campus": "Singy",
+    "month": 4,
+    "day": 11,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://cl.linkedin.com/in/mivelasco"
+  },
+  {
+    "name": "Fernanda Sallum",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 20,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/fernanda-sallum-4a036710a/"
+  },
+  {
+    "name": "Nicholas Ratinaud",
+    "campus": "Singy",
+    "month": 11,
+    "day": 10,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/nicholas-ratinaud"
+  },
+  {
+    "name": "Baldwin Yinkore",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 25,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/yinkore-baldwin/"
+  },
+  {
+    "name": "Aprajita Singh",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 1,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/aprajitasingh38"
+  },
+  {
+    "name": "Ali Elsayed",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 5,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/ali-el-sayed-cfa-0665b870/"
+  },
+  {
+    "name": "Alba Wang",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 23,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/albawang/"
+  },
+  {
+    "name": "Ariel Abraham",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 8,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "http://linkedin.com/in/arielabraham"
+  },
+  {
+    "name": "Charlie Lozano Huidobro",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 11,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/carlos-lozano-huidobro-284383139?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Gonzalo Salazar",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/gonzalo-salazar-lahera/"
+  },
+  {
+    "name": "Félix Lambilliotte",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 12,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/felixlambilliotte"
+  },
+  {
+    "name": "Mykyta Sergeev",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 29,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/mykyta-sergeev/"
+  },
+  {
+    "name": "Guillermo Charlán Fuertes",
+    "campus": "Singy",
+    "month": 5,
+    "day": 14,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/guillermo-charl%C3%A1n-fuertes-24419718a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Callum Bartlett",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/callumbartlett"
+  },
+  {
+    "name": "Christel Keyrouz",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 15,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/christel-keyrouz"
+  },
+  {
+    "name": "Felix Fotso Kuate",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 26,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/ fotsofelix"
+  },
+  {
+    "name": "David Greenwald",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 28,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/davidgreenwald8/"
+  },
+  {
+    "name": "Chetan Ramakrishnan",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 6,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/chetanand-ramakrishnan"
+  },
+  {
+    "name": "Arushi Tewari",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 12,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/arushi-tewari"
+  },
+  {
+    "name": "Athena Chondropoulou",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 18,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/athenachondropoulou/"
+  },
+  {
+    "name": "Raj Birgi",
+    "campus": "Singy",
+    "month": 3,
+    "day": 5,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/me?trk=p_mwlite_profile_self-secondary_nav"
+  },
+  {
+    "name": "Freddie Chambers",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 25,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/freddiecchambers/"
+  },
+  {
+    "name": "Bhaskar Venkatraman",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 27,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/bhaskarvenkat/"
+  },
+  {
+    "name": "Francesco Perniciaro Spatrisano",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 25,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/francescoperniciaro/"
+  },
+  {
+    "name": "Alan Schilis",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 24,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/alanschilis/"
+  },
+  {
+    "name": "Danni Co",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/danni-co/"
+  },
+  {
+    "name": "Chetan Gupta",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 6,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/chetanguptaprofile/"
+  },
+  {
+    "name": "Denise Caljouw",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 8,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/denisecaljouw/"
+  },
+  {
+    "name": "Liyang Guo",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 21,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/liyang-guo-723839ab"
+  },
+  {
+    "name": "Arun Sridhar",
+    "campus": "Singy",
+    "month": 8,
+    "day": 10,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/arunsridhar"
+  },
+  {
+    "name": "Iago Mameri",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 19,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/iago-campos-mameri-0bb626132/"
+  },
+  {
+    "name": "Felix Schinkovits",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 14,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/felix-schinkovits?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Nick Hauck",
+    "campus": "Singy",
+    "month": 4,
+    "day": 2,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/nick- hauck-451869166"
+  },
+  {
+    "name": "Estefânia Esbaile",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 15,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/estef%C3%A2nia-esbaile-242a14a2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Eitel Rosenkranz",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 15,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/eitel-rosenkranz-contardo-528a7b87"
+  },
+  {
+    "name": "Danica Malhotra",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 21,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/danica-malhotra/"
+  },
+  {
+    "name": "Ziad Haddad",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 27,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/haddadziad"
+  },
+  {
+    "name": "Ahmad Mourad",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 8,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/ahmad-mourad-02396b1a4"
+  },
+  {
+    "name": "Marlene Thalhammer",
+    "campus": "Singy",
+    "month": 1,
+    "day": 13,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/marlene-thalhammer"
+  },
+  {
+    "name": "Dhananjay Sahoo",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 22,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/djsahoo"
+  },
+  {
+    "name": "Mehdi El Ayachi",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 17,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/m/in/elayachimehdi/"
+  },
+  {
+    "name": "Zainab El Hassani Tbatou",
+    "campus": "Singy",
+    "month": 5,
+    "day": 8,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/zineb-el-hassani/"
+  },
+  {
+    "name": "Johannes Strietzel",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 14,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://de.linkedin.com/in/johannes-strietzel"
+  },
+  {
+    "name": "Varun Mustyala",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 11,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/in/varunmustyala"
+  },
+  {
+    "name": "Alberto Calvo Hernández",
+    "campus": "Singy",
+    "month": 7,
+    "day": 11,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/alberto-calvo-hernandez"
+  },
+  {
+    "name": "Guilain Madelpuech",
+    "campus": "Singy",
+    "month": 12,
+    "day": 17,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/guilain-madelpuech-08899a131?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "John Bryant",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 7,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/john-bryant1996/"
+  },
+  {
+    "name": "Jungeun Park",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 3,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "http://linkedin.com/in/jung-eun-park-397382115"
+  },
+  {
+    "name": "Habib Baladi",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 22,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/habibantoinebaladi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Guilherme Aresta Branco",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 31,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/guilhermeabranco/"
+  },
+  {
+    "name": "Mallory Miller",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 16,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/mallorycmiller/"
+  },
+  {
+    "name": "Karim Hafez",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 9,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/karim-hafez-007b90204/"
+  },
+  {
+    "name": "Gim Chuan Ong",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 17,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "http://linkedin.com/in/gim-chuan-ong"
+  },
+  {
+    "name": "Ken Kartawijaya",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 17,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/ken-kartawijaya/"
+  },
+  {
+    "name": "Marcella Falcao",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 13,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/marcellafalcao"
+  },
+  {
+    "name": "Loic Mbakop Yebga",
+    "campus": "Singy",
+    "month": 1,
+    "day": 30,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "http://www.linkedin.com/in/loic-mbakop-8074a878"
+  },
+  {
+    "name": "Karim Gemayel",
+    "campus": "Singy",
+    "month": 12,
+    "day": 21,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/karim-gemayel-7a848819b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Jan Boon",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 28,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://Www.linkedin.com/in/jan-boon-040253189"
+  },
+  {
+    "name": "Laís Victoria Ometto",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 17,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/la%C3%ADs-ometto-a6067612b/"
+  },
+  {
+    "name": "Louis Pommery",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 27,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://it.linkedin.com/in/louis-pommery"
+  },
+  {
+    "name": "Johnny Abi Radi Abou Jaoudeh",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 18,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/johnny-abou-jaoudeh?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Hannah Sun",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://linkedin.com/in/hannahsun"
+  },
+  {
+    "name": "Joon Kim",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 1,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/joon-yong-kim-816238264?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Martina Caridi",
+    "campus": "Singy",
+    "month": 12,
+    "day": 22,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/martina-caridi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Hafiz Zubair",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 10,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/hafiz-zubair/"
+  },
+  {
+    "name": "Jasmine Tsai",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 10,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/jasminetsai10"
+  },
+  {
+    "name": "Kunal Arora",
+    "campus": "Singy",
+    "month": 7,
+    "day": 29,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/kunal-arora297"
+  },
+  {
+    "name": "Justin Uffelman",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 10,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/JustinUffelman"
+  },
+  {
+    "name": "Jessica Dill",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 21,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/jessica-dill-ccp/"
+  },
+  {
+    "name": "Clay Lin",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/linclay"
+  },
+  {
+    "name": "Jordin Borer",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 13,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/jordinborer"
+  },
+  {
+    "name": "Lina Brandão Morán Lima",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 22,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/lina-maria-brandao-moran"
+  },
+  {
+    "name": "Mamadou Ngom",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/mamadou-ngom-5b5968131/"
+  },
+  {
+    "name": "Kevin Abi Ghosn",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 25,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/kevin-abi-ghosn-07471018b/"
+  },
+  {
+    "name": "Simon Katende",
+    "campus": "Singy",
+    "month": 6,
+    "day": 27,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/simon-katende/"
+  },
+  {
+    "name": "Romanshi Gupta",
+    "campus": "Singy",
+    "month": 10,
+    "day": 14,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://linkedin.com/in/romanshi-gupta"
+  },
+  {
+    "name": "Maurice Waked",
+    "campus": "Fonty",
+    "month": 10,
+    "day": 14,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "http://ae.linkedin.com/in/mauricewaked"
+  },
+  {
+    "name": "Kanishk Singh",
+    "campus": "Singy",
+    "month": 2,
+    "day": 7,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/kanishk-singh?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Gabi Klein",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/gabriellaklein"
+  },
+  {
+    "name": "Elsie Houston",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 15,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "http://linkedin.com/in/elsie-houston-708032104"
+  },
+  {
+    "name": "Renz Sabino",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 18,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/renzsabino"
+  },
+  {
+    "name": "Fernanda Correa",
+    "campus": "Singy",
+    "month": 4,
+    "day": 29,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://linkedin.com/in/fcorreap"
+  },
+  {
+    "name": "Borbala Kern",
+    "campus": "Singy",
+    "month": 4,
+    "day": 11,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/borbala-kern"
+  },
+  {
+    "name": "Quentin Rühl",
+    "campus": "Singy",
+    "month": 9,
+    "day": 27,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/quentinruhl"
+  },
+  {
+    "name": "Cliffe Kim",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/jcliffekim"
+  },
+  {
+    "name": "Lele Jiang",
+    "campus": "Singy",
+    "month": 1,
+    "day": 2,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/lele-j-764222130"
+  },
+  {
+    "name": "Nicolas Khoury Khoriati",
+    "campus": "Singy",
+    "month": 6,
+    "day": 7,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/nicolas-khoriati?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Nahl Jabbar",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 14,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/nahljabbar?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Omar Chemaly",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 5,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/omar-chemaly-342274195"
+  },
+  {
+    "name": "Howard Hendarta",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 6,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/howard-hendarta-1b98b5218/"
+  },
+  {
+    "name": "Ibukun Koleoso",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 5,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin/in/ibukunkoleoso"
+  },
+  {
+    "name": "Parag Rahangdale",
+    "campus": "Singy",
+    "month": 9,
+    "day": 8,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/paragr/"
+  },
+  {
+    "name": "Neeshma Shibu",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 1,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/neeshma-shibu"
+  },
+  {
+    "name": "Nathan Best",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/nathanbestimpact"
+  },
+  {
+    "name": "Karim Aboucham",
+    "campus": "Singy",
+    "month": 3,
+    "day": 2,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/karim-abou-cham-671855148?"
+  },
+  {
+    "name": "Jay Chopra",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 9,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/choprajay"
+  },
+  {
+    "name": "Kuldeep Panjwani",
+    "campus": "Singy",
+    "month": 5,
+    "day": 21,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://ca.linkedin.com/in/kuldeeppanjwani"
+  },
+  {
+    "name": "Saif Kanchwala",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 23,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/saif-kanchwala-298311149"
+  },
+  {
+    "name": "Arthur Maroquene Froissart",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/arthurmf/"
+  },
+  {
+    "name": "Arnav Walecha",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 30,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/arnav-tarun-walecha?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Vivek Jain",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://linkedin.com/in/vivek13jain"
+  },
+  {
+    "name": "Vivek Singh",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 14,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/vivek-singh-019309200"
+  },
+  {
+    "name": "Taylor Thompson",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://linkedin.com/in/taylordthompson"
+  },
+  {
+    "name": "Pietro Seracini",
+    "campus": "Singy",
+    "month": 9,
+    "day": 2,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://share.google/s7EZhPQLwZjnBTKDM"
+  },
+  {
+    "name": "Jj De Velasco",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/jjdevelasco?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Yara Jaafar",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 21,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/yara-jaafar-53311619"
+  },
+  {
+    "name": "Simon Stadlbauer",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 4,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/simonstadlbauer/?locale=en"
+  },
+  {
+    "name": "Sam Hajjar",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 7,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "http://linkedin.com/in/sam-hajjar"
+  },
+  {
+    "name": "Sander Goudriaan",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 25,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/sander-goudriaan-82b896112?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Teresa Teixeira",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 16,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/maria-teresa-teixeira"
+  },
+  {
+    "name": "April Zaw",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 24,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/april-zaw/"
+  },
+  {
+    "name": "Sandeep Lakshmipathy",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 17,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/sandeepklakshmipathy/"
+  },
+  {
+    "name": "Sashin Pillay",
+    "campus": "Singy",
+    "month": 3,
+    "day": 19,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/sashin-pillay-gonzalez"
+  },
+  {
+    "name": "Zhuyun Cao",
+    "campus": "Singy",
+    "month": 4,
+    "day": 30,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/zhuyun-cao"
+  },
+  {
+    "name": "Pedro Gavajda",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 11,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/pedrogav/"
+  },
+  {
+    "name": "Vedran Zanchi",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/vedranzanchi/"
+  },
+  {
+    "name": "Mariana Sánchez Torres",
+    "campus": "Singy",
+    "month": 6,
+    "day": 13,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://sg.linkedin.com/in/mariana-s%C3%A1nchez-torres-6158a975"
+  },
+  {
+    "name": "Timm Vogler",
+    "campus": "Singy",
+    "month": 11,
+    "day": 7,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/timmvogler?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+  },
+  {
+    "name": "Thomas Mulwa",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 16,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/thomasmulwa/"
+  },
+  {
+    "name": "Wagner De Oliveira Filho",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 12,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://br.linkedin.com/in/wagner-oliveira-filho"
+  },
+  {
+    "name": "Kevin Pearce",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 9,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/kevin-jesse-pearce"
+  },
+  {
+    "name": "Marwan Mattar",
+    "campus": "Singy",
+    "month": 7,
+    "day": 7,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/marwan-rafik-4677801a8?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Joshua Dawe",
+    "campus": "Singy",
+    "month": 4,
+    "day": 12,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/joshuadawe/"
+  },
+  {
+    "name": "Sojung Bae",
+    "campus": "Singy",
+    "month": 9,
+    "day": 10,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/in/sojungbae"
+  },
+  {
+    "name": "Revati Devasthale",
+    "campus": "Singy",
+    "month": 10,
+    "day": 23,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/revati-d/"
+  },
+  {
+    "name": "Zoé Barbier-Mueller",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 31,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://Www.linkedin.com/in/zoé-barbier-mueller-8942a777"
+  },
+  {
+    "name": "Zakaria Itani",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.LinkedIn.com/in/zakaria-itani-17ab19217/"
+  },
+  {
+    "name": "Raphael Barata Pasqualette",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 27,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/raphael-barata-pasqualette-2b91b88a/"
+  },
+  {
+    "name": "Lucia Suelves",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 26,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/luciasuelvesosorio/"
+  },
+  {
+    "name": "Miguel Santos",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 5,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/miguel-s-58457458/?skipRedirect=true"
+  },
+  {
+    "name": "Angela Bandolo Mbarga",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 16,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/angela-mbarga-453543213?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Ling Wang",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin/in/LING215"
+  },
+  {
+    "name": "Elisa Recabarren Allende",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 27,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://linkedin.com/in/elisa-recabarren"
+  },
+  {
+    "name": "Thierry Burckhardt",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 27,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/burckhardt"
+  },
+  {
+    "name": "Guillermo Krauch",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 9,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/guillermo-krauch-c"
+  },
+  {
+    "name": "Gregorio Rossi",
+    "campus": "Singy",
+    "month": 11,
+    "day": 22,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/rossigregorio?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Sanya Pawah",
+    "campus": "Singy",
+    "month": 10,
+    "day": 20,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "http://linkedin.com/in/sanya-pawah-5856b2142"
+  },
+  {
+    "name": "Francisco Cesar das Neves",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 5,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/fcdn/"
+  },
+  {
+    "name": "Salwa Fedawi",
+    "campus": "Singy",
+    "month": 6,
+    "day": 19,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/salwa-fidawi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Davide Monina",
+    "campus": "Singy",
+    "month": 12,
+    "day": 8,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://it.linkedin.com/in/davidemonina"
+  },
+  {
+    "name": "Teniola Ajidagba",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 5,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/teniola-ajidagba"
+  },
+  {
+    "name": "Christopher Syhr",
+    "campus": "Singy",
+    "month": 8,
+    "day": 22,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://www.linkedin.com/in/christophersyhr?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Emilie Mehl",
+    "campus": "Fonty",
+    "month": 8,
+    "day": 8,
+    "zodiac": "Leo",
+    "zodiacEmoji": "♌",
+    "linkedin": "https://HTTP://www.linkedin.com/in/emilie-mehl"
+  },
+  {
+    "name": "Sebastián López",
+    "campus": "Singy",
+    "month": 6,
+    "day": 26,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://hypos://www.linkedin.com/in/dslc/"
+  },
+  {
+    "name": "Leonardo Bacchetta",
+    "campus": "Fonty",
+    "month": 2,
+    "day": 15,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/leonardobacchetta"
+  },
+  {
+    "name": "Tara Kuhnt",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 10,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/tara-pauline-kuhnt-4156b4170/"
+  },
+  {
+    "name": "Steven Chieng",
+    "campus": "Singy",
+    "month": 4,
+    "day": 12,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "http://linkedin.com/in/stevenchieng"
+  },
+  {
+    "name": "Adi Thakral",
+    "campus": "Singy",
+    "month": 2,
+    "day": 4,
+    "zodiac": "Aquarius",
+    "zodiacEmoji": "♒",
+    "linkedin": "https://www.linkedin.com/in/aaditya-thakral?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+  },
+  {
+    "name": "Jonas Bruns",
+    "campus": "Singy",
+    "month": 10,
+    "day": 27,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/brunsj/"
+  },
+  {
+    "name": "Divi Mendonca",
+    "campus": "Fonty",
+    "month": 5,
+    "day": 20,
+    "zodiac": "Taurus",
+    "zodiacEmoji": "♉",
+    "linkedin": "https://www.linkedin.com/in/divi-mendonca"
+  },
+  {
+    "name": "Mila Solaja",
+    "campus": "Fonty",
+    "month": 3,
+    "day": 18,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://Linkedin.com/mila-solaja"
+  },
+  {
+    "name": "Katie Anderson",
+    "campus": "Fonty",
+    "month": 1,
+    "day": 2,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/katie-anderson-4b89621b1"
+  },
+  {
+    "name": "Fernanda Sallum",
+    "campus": "Fonty",
+    "month": 7,
+    "day": 20,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/fernanda-sallum-4a036710a/"
+  },
+  {
+    "name": "Shuijing Liu",
+    "campus": "Singy",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "http://linkedin.com/in/shuijing-katherine-liu-a4268364"
+  },
+  {
+    "name": "Shunsuke Onogi",
+    "campus": "Singy",
+    "month": 7,
+    "day": 16,
+    "zodiac": "Cancer",
+    "zodiacEmoji": "♋",
+    "linkedin": "https://www.linkedin.com/in/shunsuke-onogi-114698b9/"
+  },
+  {
+    "name": "June Pan",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 12,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "https://www.linkedin.com/in/june-p-37a368189/"
+  },
+  {
+    "name": "Fumi Yamamoto",
+    "campus": "Singy",
+    "month": 1,
+    "day": 8,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/fumitakayamamoto/"
+  },
+  {
+    "name": "Thomas Keller",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 27,
+    "zodiac": "Libra",
+    "zodiacEmoji": "♎",
+    "linkedin": "https://www.linkedin.com/in/thomas-armin-keller/"
+  },
+  {
+    "name": "Hajar Laghrib",
+    "campus": "Fonty",
+    "month": 11,
+    "day": 7,
+    "zodiac": "Scorpio",
+    "zodiacEmoji": "♏",
+    "linkedin": "http://linkedin.com/in/hajarlaghrib"
+  },
+  {
+    "name": "Emmanuel Singha",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/emmanuel-franck-singha-5b8071180/"
+  },
+  {
+    "name": "Avni Kataria",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/avni-kataria-a05082159"
+  },
+  {
+    "name": "Arthur Sepret",
+    "campus": "Fonty",
+    "month": 9,
+    "day": 9,
+    "zodiac": "Virgo",
+    "zodiacEmoji": "♍",
+    "linkedin": "https://www.linkedin.com/feed/"
+  },
+  {
+    "name": "Mouad Rouis",
+    "campus": "Fonty",
+    "month": 6,
+    "day": 14,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/mouadrouis/"
+  },
+  {
+    "name": "Sukyoung Kim",
+    "campus": "Singy",
+    "month": 4,
+    "day": 12,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/sukyoung-kim"
+  },
+  {
+    "name": "Tommaso Baiocco",
+    "campus": "Singy",
+    "month": 6,
+    "day": 10,
+    "zodiac": "Gemini",
+    "zodiacEmoji": "♊",
+    "linkedin": "https://www.linkedin.com/in/tommaso-baiocco/"
+  },
+  {
+    "name": "Jun Ki Shin",
+    "campus": "Singy",
+    "month": 12,
+    "day": 23,
+    "zodiac": "Capricorn",
+    "zodiacEmoji": "♑",
+    "linkedin": "https://www.linkedin.com/in/jun-ki-shin/"
+  },
+  {
+    "name": "Hizkia Hamonangan",
+    "campus": "Fonty",
+    "month": 12,
+    "day": 4,
+    "zodiac": "Sagittarius",
+    "zodiacEmoji": "♐",
+    "linkedin": "https://www.linkedin.com/in/hizkia-hamonangan/"
+  },
+  {
+    "name": "Antonia Troell",
+    "campus": "Fonty",
+    "month": 0,
+    "day": 0,
+    "zodiac": "",
+    "zodiacEmoji": "",
+    "linkedin": "https://www.linkedin.com/in/antonia-troell/"
+  },
+  {
+    "name": "Jk Park",
+    "campus": "Singy",
+    "month": 3,
+    "day": 24,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://linkedin.com/in/jeongkeumpark"
+  },
+  {
+    "name": "Lillian Guan",
+    "campus": "Fonty",
+    "month": 4,
+    "day": 2,
+    "zodiac": "Aries",
+    "zodiacEmoji": "♈",
+    "linkedin": "https://www.linkedin.com/in/lillian-guan-527b589a?utm_source=share_via&utm_content=profile&utm_medium=member_ios"
+  },
+  {
+    "name": "Lukas Zuellig Knecht",
+    "campus": "Singy",
+    "month": 3,
+    "day": 15,
+    "zodiac": "Pisces",
+    "zodiacEmoji": "♓",
+    "linkedin": "https://www.linkedin.com/in/lukas-knecht"
+  }
+];
+
+const MN = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+const MS = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ZC = {
+  Aries:'#ef4444',Taurus:'#22c55e',Gemini:'#eab308',Cancer:'#94a3b8',
+  Leo:'#f97316',Virgo:'#84cc16',Libra:'#ec4899',Scorpio:'#8b5cf6',
+  Sagittarius:'#f43f5e',Capricorn:'#6366f1',Aquarius:'#06b6d4',Pisces:'#14b8a6'
+};
+const LI = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>';
+
+let currentCampus = 'all';
+let currentSearch = '';
+let currentView = 'timeline';
+
+const today = new Date();
+today.setHours(0,0,0,0);
+
+document.getElementById('topbar-date').textContent = today.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+const known = PEOPLE.filter(p => p.month > 0);
+const unknown = PEOPLE.filter(p => p.month === 0);
+
+// Add daysUntil to each person
+function calcDaysUntil(m, d) {
+  const yr = today.getFullYear();
+  let next = new Date(yr, m - 1, d);
+  next.setHours(0,0,0,0);
+  if (next < today) next = new Date(yr + 1, m - 1, d);
+  return Math.round((next - today) / 86400000);
+}
+
+known.forEach(p => { p.daysUntil = calcDaysUntil(p.month, p.day); });
+known.sort((a, b) => a.daysUntil - b.daysUntil);
+
+// Hero subtitle
+const todayBdays = known.filter(p => p.daysUntil === 0);
+const nextUp = known.find(p => p.daysUntil > 0);
+if (todayBdays.length > 0) {
+  document.getElementById('hero-sub').innerHTML = '\u{1F389} Happy Birthday ' + todayBdays.map(p => '<b>' + p.name + '</b>').join(', ') + '!';
+} else if (nextUp) {
+  const w = nextUp.daysUntil === 1 ? 'tomorrow' : 'in ' + nextUp.daysUntil + ' days';
+  document.getElementById('hero-sub').innerHTML = 'Next up: <b>' + nextUp.name + '</b> ' + nextUp.zodiacEmoji + ' - ' + nextUp.day + ' ' + MS[nextUp.month] + ' (' + w + ')';
+} else {
+  document.getElementById('hero-sub').textContent = known.length + ' birthdays tracked';
+}
+
+function daysClass(d) {
+  if (d === 0) return 'today';
+  if (d <= 7) return 'soon';
+  if (d <= 60) return 'mid';
+  return 'far';
+}
+
+function barColor(d) {
+  if (d === 0) return 'var(--pink)';
+  if (d <= 7) return 'var(--pink)';
+  if (d <= 30) return 'var(--accent)';
+  if (d <= 90) return 'var(--fonty)';
+  return 'var(--border)';
+}
+
+function sectionLabel(d) {
+  if (d === 0) return '\u{1F382} Today';
+  if (d <= 7) return '\u{1F4C5} This week';
+  if (d <= 30) return '\u{1F31F} This month';
+  if (d <= 90) return '\u{23F3} Coming up';
+  if (d <= 180) return '\u{1F4C6} Later this year';
+  return '\u{1F52E} Way out';
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-container');
+  const filtered = known.filter(p => {
+    if (currentCampus !== 'all' && p.campus !== currentCampus) return false;
+    if (currentSearch && !p.name.toLowerCase().includes(currentSearch.toLowerCase())) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty">No birthdays match your search</div>';
+    return;
+  }
+
+  // Sort by daysUntil
+  filtered.sort((a, b) => a.daysUntil - b.daysUntil);
+
+  let html = '';
+  let lastSection = '';
+
+  filtered.forEach(p => {
+    const section = sectionLabel(p.daysUntil);
+    if (section !== lastSection) {
+      html += '<div class="tl-section-header">' + section + '</div>';
+      lastSection = section;
+    }
+
+    const dc = daysClass(p.daysUntil);
+    const barPct = Math.max(2, 100 - (p.daysUntil / 365 * 100));
+    const daysText = p.daysUntil === 0 ? 'Today!' : p.daysUntil === 1 ? 'Tomorrow' : p.daysUntil + ' days';
+    const linkedinHtml = p.linkedin ? '<a href="' + p.linkedin + '" target="_blank" rel="noopener" class="tl-linkedin" title="LinkedIn">' + LI + '</a>' : '';
+    const todayRow = p.daysUntil === 0 ? ' is-today' : '';
+
+    html += '<div class="tl-row' + todayRow + '">' +
+      '<div class="tl-days ' + dc + '">' +
+        '<span class="num">' + (p.daysUntil === 0 ? '\u{1F389}' : p.daysUntil) + '</span>' +
+        '<span class="label">' + (p.daysUntil === 0 ? 'today' : 'days') + '</span>' +
+      '</div>' +
+      '<div class="tl-bar-wrap">' +
+        '<div class="tl-name-row">' +
+          '<span class="tl-name">' + p.name + '</span>' +
+          linkedinHtml +
+        '</div>' +
+        '<div class="tl-meta">' +
+          '<span class="tl-date">' + p.day + ' ' + MS[p.month] + '</span>' +
+          '<span class="campus campus-' + p.campus.toLowerCase() + '">' + p.campus + '</span>' +
+          '<span>' + p.zodiacEmoji + ' ' + p.zodiac + '</span>' +
+        '</div>' +
+        '<div class="tl-bar"><div class="tl-bar-fill" style="width:' + barPct + '%;background:' + barColor(p.daysUntil) + '"></div></div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function renderMystery() {
+  const container = document.getElementById('mystery-container');
+  const filtered = unknown.filter(p => {
+    if (currentCampus !== 'all' && p.campus !== currentCampus) return false;
+    if (currentSearch && !p.name.toLowerCase().includes(currentSearch.toLowerCase())) return false;
+    return true;
+  });
+  if (filtered.length === 0) { container.innerHTML = ''; return; }
+  let html = '<div class="mystery-title">\u{1F52E} Unknown birthdays (' + filtered.length + ')</div><div class="mystery-grid">';
+  filtered.forEach(p => {
+    const li = p.linkedin ? '<a href="' + p.linkedin + '" target="_blank" rel="noopener">' + LI + '</a>' : '';
+    html += '<div class="mystery-chip"><span class="campus campus-' + p.campus.toLowerCase() + '">' + p.campus + '</span>' + p.name + li + '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function renderStats() {
+  const container = document.getElementById('stats-container');
+  const zodiacCounts = {};
+  const monthCounts = Array(13).fill(0);
+  const fontyCounts = Array(13).fill(0);
+  const singyCounts = Array(13).fill(0);
+  const dateMap = {};
+
+  known.forEach(p => {
+    zodiacCounts[p.zodiac] = (zodiacCounts[p.zodiac] || 0) + 1;
+    monthCounts[p.month]++;
+    if (p.campus === 'Fonty') fontyCounts[p.month]++;
+    else singyCounts[p.month]++;
+    const key = p.day + '/' + p.month;
+    if (!dateMap[key]) dateMap[key] = [];
+    dateMap[key].push(p.name);
+  });
+
+  let busiestMonth = 1;
+  for (let i = 1; i <= 12; i++) { if (monthCounts[i] > monthCounts[busiestMonth]) busiestMonth = i; }
+  const topZ = Object.entries(zodiacCounts).sort((a,b) => b[1] - a[1])[0];
+  const twins = Object.entries(dateMap).filter(([k,v]) => v.length > 1).sort((a,b) => {
+    const [ad,am] = a[0].split('/').map(Number);
+    const [bd,bm] = b[0].split('/').map(Number);
+    return am - bm || ad - bd;
+  });
+
+  // Zodiac bar chart
+  const zodiacOrder = ['Capricorn','Aquarius','Pisces','Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius'];
+  const ze = {Aries:'\u2648',Taurus:'\u2649',Gemini:'\u264a',Cancer:'\u264b',Leo:'\u264c',Virgo:'\u264d',Libra:'\u264e',Scorpio:'\u264f',Sagittarius:'\u2650',Capricorn:'\u2651',Aquarius:'\u2652',Pisces:'\u2653'};
+  const maxZ = Math.max(...Object.values(zodiacCounts));
+
+  let zbars = zodiacOrder.map(z => {
+    const c = zodiacCounts[z] || 0;
+    const pct = maxZ > 0 ? (c / maxZ * 100) : 0;
+    return '<div class="zbar"><span class="zbar-label">' + ze[z] + ' ' + z + '</span><div class="zbar-track"><div class="zbar-fill" style="width:' + pct + '%;background:' + (ZC[z]||'#888') + '"></div></div><span class="zbar-val">' + c + '</span></div>';
+  }).join('');
+
+  // Heatmap
+  const maxH = Math.max(...fontyCounts.slice(1), ...singyCounts.slice(1), 1);
+  function hc(v, isF) {
+    if (v === 0) return 'background:var(--border-light);color:var(--ink-faint)';
+    const i = Math.min(v / maxH, 1);
+    const a = 0.15 + i * 0.65;
+    if (isF) return 'background:rgba(30,58,95,' + a + ');color:' + (i > 0.4 ? '#fff' : 'var(--fonty)');
+    return 'background:rgba(194,97,10,' + a + ');color:' + (i > 0.4 ? '#fff' : 'var(--singy)');
+  }
+  let hm = '<div class="heat"><div></div>';
+  for (let m=1;m<=12;m++) hm += '<div class="heat-hdr">' + MS[m] + '</div>';
+  hm += '<div class="heat-lbl">Fonty</div>';
+  for (let m=1;m<=12;m++) hm += '<div class="heat-cell" style="' + hc(fontyCounts[m],true) + '">' + fontyCounts[m] + '</div>';
+  hm += '<div class="heat-lbl">Singy</div>';
+  for (let m=1;m<=12;m++) hm += '<div class="heat-cell" style="' + hc(singyCounts[m],false) + '">' + singyCounts[m] + '</div>';
+  hm += '</div>';
+
+  // Twins
+  let tw = '';
+  if (twins.length > 0) {
+    tw = twins.map(([dt, names]) => {
+      const [d,m] = dt.split('/').map(Number);
+      return '<div class="twins-row"><span class="twins-date">' + d + ' ' + MS[m] + '</span> - ' + names.join(', ') + '</div>';
+    }).join('');
+  } else {
+    tw = '<div style="color:var(--ink-faint);font-size:12px">No birthday twins found</div>';
+  }
+
+  container.innerHTML =
+    '<div class="stats-title">Quick stats</div>' +
+    '<div class="stats-grid">' +
+      '<div class="stat-card"><div class="stat-label">Busiest month</div><div class="stat-value">' + MS[busiestMonth] + '</div><div class="stat-sub">' + monthCounts[busiestMonth] + ' birthdays</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Top sign</div><div class="stat-value">' + (topZ ? topZ[0] : '-') + '</div><div class="stat-sub">' + (topZ ? topZ[1] + ' people' : '') + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Cohort</div><div class="stat-value">' + PEOPLE.length + '</div><div class="stat-sub">' + known.length + ' known, ' + unknown.length + ' unknown</div></div>' +
+    '</div>' +
+    '<div class="stats-wide"><h3>Zodiac distribution</h3>' + zbars + '</div>' +
+    '<div class="stats-wide"><h3>Campus heatmap by month</h3>' + hm + '</div>' +
+    '<div class="stats-wide"><h3>Birthday twins \u{1F46F}</h3>' + tw + '</div>';
+}
+
+// Controls
+function setCampus(c) {
+  currentCampus = c;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.campus === c));
+  renderTimeline();
+  renderMystery();
+}
+
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase() === v));
+  document.getElementById('timeline-view').style.display = v === 'timeline' ? '' : 'none';
+  document.getElementById('stats-view').style.display = v === 'stats' ? '' : 'none';
+  if (v === 'stats') renderStats();
+}
+
+document.getElementById('search-input').addEventListener('input', function() {
+  currentSearch = this.value;
+  renderTimeline();
+  renderMystery();
+});
+
+// Init
+renderTimeline();
+renderMystery();
+</script>
+</body>
+</html>
