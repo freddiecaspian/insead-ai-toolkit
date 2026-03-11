@@ -11,7 +11,7 @@ from datetime import datetime, date
 from pathlib import Path
 
 CSV_PATH = Path("/Users/freddiechambers/Library/Mobile Documents/iCloud~md~obsidian/Documents/iCloud/21. PDFs/Proud to be a part of INSEAD 26D! (Dec 2025) (2).csv")
-OUTPUT_PATH = Path("/Users/freddiechambers/Projects/insead-tool-repo/birthdays.html")
+OUTPUT_PATH = Path("/Users/freddiechambers/Projects/insead-tool-repo/birthdays/index.html")
 
 
 def parse_name(raw_first_name):
