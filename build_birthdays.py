@@ -173,7 +173,64 @@ def main():
                 "linkedin": linkedin,
             })
 
-    print(f"Parsed {len(people)} people ({len([p for p in people if p['month'] > 0])} with birthdays, {len([p for p in people if p['month'] == 0])} unknown)")
+    print(f"Parsed {len(people)} from main CSV")
+
+    # === ADD MISSING PEOPLE from E6 calendar + Section D class contribution analysis ===
+    # These people appear in Section D / E6 study group but not in the WhatsApp contacts CSV
+    # E6 birthday calendar provides birthdays; Section D analysis confirms full names
+    extra_people = [
+        # From E6 calendar (with birthdays)
+        {"name": "Oussama Obeid",       "campus": "Fonty", "bday": (8, 24)},
+        {"name": "Madeleine Kelly",     "campus": "Fonty", "bday": (11, 5)},
+        {"name": "Andrew Bauer",        "campus": "Fonty", "bday": (4, 30)},
+        {"name": "Chris Johnson",       "campus": "Fonty", "bday": (11, 29)},
+        {"name": "Sabine Rihan",        "campus": "Fonty", "bday": (11, 1)},
+        {"name": "Lars Ballhausen",     "campus": "Fonty", "bday": (4, 8)},
+        {"name": "Mya Ojogwu",          "campus": "Fonty", "bday": (9, 16)},
+        # From Section D analysis (no birthday data)
+        {"name": "Vernes Rasidkadic",   "campus": "Fonty", "bday": None},
+        {"name": "Raja Makhlouf",       "campus": "Fonty", "bday": None},
+        {"name": "Eva Sinha",           "campus": "Fonty", "bday": None},
+        {"name": "Francesco Danovi",    "campus": "Fonty", "bday": None},
+        {"name": "Isabella Isotta",     "campus": "Fonty", "bday": None},
+        {"name": "Armand Goze",         "campus": "Fonty", "bday": None},
+        {"name": "Michelle Baaklini",   "campus": "Fonty", "bday": None},
+        {"name": "Jozef Tanzer",        "campus": "Fonty", "bday": None},
+        {"name": "Nassib Abou Nader",   "campus": "Fonty", "bday": None},
+        {"name": "Jeff Neukomm",        "campus": "Fonty", "bday": None},
+        {"name": "Marta Villagran Prieto", "campus": "Fonty", "bday": None},
+        {"name": "Claire Maybank",      "campus": "Fonty", "bday": None},
+        {"name": "Yara Bou Maachar",    "campus": "Fonty", "bday": None},
+    ]
+
+    # Dedup against existing names
+    existing_names = set(p["name"].lower() for p in people)
+    added = 0
+    for ep in extra_people:
+        if ep["name"].lower() in existing_names:
+            continue
+        entry = {
+            "name": ep["name"],
+            "campus": ep["campus"],
+            "month": 0,
+            "day": 0,
+            "zodiac": "",
+            "zodiacEmoji": "",
+            "linkedin": "",
+        }
+        if ep["bday"]:
+            m, d = ep["bday"]
+            entry["month"] = m
+            entry["day"] = d
+            z_name, z_emoji = get_zodiac(m, d)
+            entry["zodiac"] = z_name
+            entry["zodiacEmoji"] = z_emoji
+        people.append(entry)
+        existing_names.add(ep["name"].lower())
+        added += 1
+
+    print(f"Added {added} extra people from E6 calendar + Section D analysis")
+    print(f"Total: {len(people)} people ({len([p for p in people if p['month'] > 0])} with birthdays, {len([p for p in people if p['month'] == 0])} unknown)")
 
     people_json = json.dumps(people, ensure_ascii=False, indent=2)
     html = generate_html(people_json)
